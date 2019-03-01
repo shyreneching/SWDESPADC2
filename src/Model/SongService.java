@@ -3,7 +3,6 @@ package Model;
 import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class SongService {
     private MusicPlayerDB db;
@@ -103,36 +102,38 @@ public class SongService {
     public Song getSong(String songid) throws SQLException {
         Connection connection = db.getConnection();
 
-        String query ="SELECT * FROM song WHERE idsong = " + songid;
+        String query ="SELECT * FROM song WHERE idsong = '" + songid + "'";
         PreparedStatement statement = connection.prepareStatement(query);
         try {
-
             ResultSet rs = statement.executeQuery();
-            Song s = new Song();
-            s.setSongid(rs.getString("idsong"));
-            s.setName(rs.getString("songname"));
-            s.setGenre(rs.getString("genre"));
-            s.setArtist(rs.getString("artist"));
-            s.setAlbum(rs.getString("album"));
-            s.setYear(rs.getInt("year"));
-            s.setTrackNumber(rs.getInt("trackNumber"));
-            s.setLength(rs.getInt("length"));
-            s.setSize(rs.getFloat("size"));
-            // sets the name to "Artist-title"
-            s.setFilename(s.getArtist() + "-"+ s.getName());
+            if(rs.next()) {
+                Song s = new Song();
+                s.setSongid(rs.getString("idsong"));
+                s.setName(rs.getString("songname"));
+                s.setGenre(rs.getString("genre"));
+                s.setArtist(rs.getString("artist"));
+                s.setAlbum(rs.getString("album"));
+                s.setYear(rs.getInt("year"));
+                s.setTrackNumber(rs.getInt("trackNumber"));
+                s.setLength(rs.getInt("length"));
+                s.setSize(rs.getFloat("size"));
 
-            //gets the song from the databse and make put it in a File datatype
-            File theFile = new File(s.getName());
-            OutputStream out = new FileOutputStream(theFile);
-            InputStream input = rs.getBinaryStream("songfile");
-            byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
-            while (input.read(buffer) > 0) {
-                out.write(buffer);
+                // sets the name to "Artist-title"
+                s.setFilename(s.getArtist() + "-" + s.getName());
+
+                //gets the song from the databse and make put it in a File datatype
+                File theFile = new File(s.getArtist() + "-" + s.getName());
+                OutputStream out = new FileOutputStream(theFile);
+                InputStream input = rs.getBinaryStream("songfile");
+                byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
+                while (input.read(buffer) > 0) {
+                    out.write(buffer);
+                }
+                s.setSongfile(theFile);
+                //takes the exact location of the song
+                s.setFilelocation(theFile.getAbsolutePath());
+                return s;
             }
-            s.setSongfile(theFile);
-            //takes the exact location of the song
-            s.setFilelocation(theFile.getAbsolutePath());
-            return s;
 
         } catch (SQLException e){
             e.printStackTrace();
@@ -152,7 +153,7 @@ public class SongService {
         Connection connection = db.getConnection();
         ArrayList<Song> songs = new ArrayList<>();
 
-        String query ="SELECT * FROM song WHERE idsong = " + songname;
+        String query ="SELECT * FROM song WHERE idsong = '" + songname + "'";
         PreparedStatement statement = connection.prepareStatement(query);
         try {
 
@@ -220,7 +221,7 @@ public class SongService {
         return false;
     }
 
-    //pass the songis of the song that wants to be change and song class with COMPLETE information including the updates
+    //pass the songid of the song that wants to be change and song class with COMPLETE information including the updates
     public boolean update(String songid, Song s) throws SQLException {
         Connection connection = db.getConnection();
 
