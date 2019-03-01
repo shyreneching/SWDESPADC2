@@ -1,9 +1,7 @@
 package Model;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +14,7 @@ public class SongService {
 
     //adds aong to the database. Must be COMPLETE information
     public boolean add(Song s) throws SQLException {
-        String query = "INSERT INTO song VALUE (?, ?, ?, ?, ? ,?, ?, ?, ?)";
+        String query = "INSERT INTO song VALUE (?, ?, ?, ?, ? ,?, ?, ?, ?, ?)";
         Connection connection = db.getConnection();
         PreparedStatement statement = connection.prepareStatement(query);
 
@@ -30,13 +28,18 @@ public class SongService {
             statement.setInt(7, s.getTrackNumber());
             statement.setInt(8, s.getLength());
             statement.setDouble(9, s.getSize());
+            // Write the file into the database
+            FileInputStream songfile = new FileInputStream(s.getSongfile());
+            statement.setBinaryStream(10, songfile);
 
             boolean added = statement.execute();
 
             return added;
         } catch (SQLException e){
             e.printStackTrace();
-        }finally {
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
@@ -66,12 +69,30 @@ public class SongService {
                 s.setTrackNumber(rs.getInt("trackNumber"));
                 s.setLength(rs.getInt("length"));
                 s.setSize(rs.getFloat("size"));
+                s.setSize(rs.getFloat("size"));
+                // sets the name to "Artist-title"
+                s.setFilename(s.getArtist() + "-"+ s.getName());
+
+                //gets the song from the databse and make put it in a File datatype
+                File theFile = new File(s.getName());
+                OutputStream out = new FileOutputStream(theFile);
+                InputStream input = rs.getBinaryStream("songfile");
+                byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
+                while (input.read(buffer) > 0) {
+                    out.write(buffer);
+                }
+                s.setSongfile(theFile);
+                //takes the exact location of the song
+                s.setFilelocation(theFile.getAbsolutePath());
+
                 songs.add(s);
             }
             return songs;
         } catch (SQLException e){
             e.printStackTrace();
-        }finally {
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
@@ -97,10 +118,27 @@ public class SongService {
             s.setTrackNumber(rs.getInt("trackNumber"));
             s.setLength(rs.getInt("length"));
             s.setSize(rs.getFloat("size"));
+            // sets the name to "Artist-title"
+            s.setFilename(s.getArtist() + "-"+ s.getName());
 
+            //gets the song from the databse and make put it in a File datatype
+            File theFile = new File(s.getName());
+            OutputStream out = new FileOutputStream(theFile);
+            InputStream input = rs.getBinaryStream("songfile");
+            byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
+            while (input.read(buffer) > 0) {
+                out.write(buffer);
+            }
+            s.setSongfile(theFile);
+            //takes the exact location of the song
+            s.setFilelocation(theFile.getAbsolutePath());
             return s;
 
         } catch (SQLException e){
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if(statement != null) statement.close();
@@ -130,52 +168,47 @@ public class SongService {
                 s.setTrackNumber(rs.getInt("trackNumber"));
                 s.setLength(rs.getInt("length"));
                 s.setSize(rs.getFloat("size"));
+
+                // sets the name to "Artist-title"
+                s.setFilename(s.getArtist() + "-"+ s.getName());
+
+                //gets the song from the databse and make put it in a File datatype
+                File theFile = new File(s.getName());
+                OutputStream out = new FileOutputStream(theFile);
+                InputStream input = rs.getBinaryStream("songfile");
+                byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
+                while (input.read(buffer) > 0) {
+                    out.write(buffer);
+                }
+                s.setSongfile(theFile);
+                //takes the exact location of the song
+                s.setFilelocation(theFile.getAbsolutePath());
+
                 songs.add(s);
+
             }
             return songs;
         } catch (SQLException e){
             e.printStackTrace();
-        }finally {
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
         return null;
     }
 
-
-    //pass the username of the account that you want to view the playlist
-    public List<Playlist> getUserPlaylist(String username) throws SQLException {
-        Connection connection = db.getConnection();
-        List <Playlist> property = new ArrayList<>();
-
-        String query ="SELECT * FROM playlist INNER JOIN accounts ON username = username " +
-                "WHERE accounts.username = '" + username + "'";
-        PreparedStatement statement = connection.prepareStatement(query);
-        try {
-
-            ResultSet rs = statement.executeQuery();
-            while (rs.next()){
-
-            }
-            return property;
-        } catch (SQLException e){
-            e.printStackTrace();
-        } finally {
-            if(statement != null) statement.close();
-            if(connection != null)  connection.close();
-        }
-        return property;
-    }
-
-    //pass the username to delete an account
-    public boolean delete(String username) throws SQLException {
-        String query = "DELETE FROM accounts WHERE username = ?";
+    //pass the song id to delete the specific song
+    public boolean delete(String songid) throws SQLException {
+        String query = "DELETE FROM song WHERE songid = ?";
         Connection connection = db.getConnection();
         PreparedStatement statement = connection.prepareStatement(query);
         try {
 
-            statement.setString(1, username);
-
+            statement.setString(1, songid);
             boolean deleted  = statement.execute();
             return deleted;
         } catch (SQLException e){
@@ -187,26 +220,43 @@ public class SongService {
         return false;
     }
 
-    //pass the username of the account that wants to be change and an account class with COMPLETE information including the updates
-    public boolean update(String username, Account a) throws SQLException {
-        //UPDATE
+    //pass the songis of the song that wants to be change and song class with COMPLETE information including the updates
+    public boolean update(String songid, Song s) throws SQLException {
         Connection connection = db.getConnection();
 
-        String query = "UPDATE accounts SET "
-                + "name = ?, "
-                + "password = ?, "
+        String query = "UPDATE song SET "
+                + "songname = ?, "
+                + "genre = ?, "
+                + "artist = ?, "
+                + "album = ?, "
+                + "year = ?, "
+                + "trackNumber = ?, "
+                + "length = ?, "
+                + "size = ?, "
+                + "songfile = ?, "
                 + " WHERE username= ?";
+
         PreparedStatement statement = connection.prepareStatement(query);
         try {
-
-            statement.setString(1, a.getName());
-            statement.setString(2, a.getPassword());
-            statement.setString(3, username);
+            statement.setString(1, s.getName());
+            statement.setString(2, s.getGenre());
+            statement.setString(3, s.getArtist());
+            statement.setString(4, s.getAlbum());
+            statement.setInt(5, s.getYear());
+            statement.setInt(6, s.getTrackNumber());
+            statement.setInt(7, s.getLength());
+            statement.setDouble(8, s.getSize());
+            // Write the file into the database
+            FileInputStream songfile = new FileInputStream(s.getSongfile());
+            statement.setBinaryStream(9, songfile);
+            statement.setString(10, s.getSongid());
 
             statement.executeUpdate();
 
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         } finally {
             if(statement != null) statement.close();

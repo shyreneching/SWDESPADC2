@@ -5,6 +5,9 @@
  */
 package Model;
 
+
+import java.io.File;
+
 /**
  *
  * @author Stanley Sie
@@ -14,6 +17,8 @@ public class Song {
     private String songid, name, genre, artist, album;
     private int year, trackNumber, length;
     private double size;
+    private File songfile;
+    private String filename, filelocation;
 
 
     public String getSongid() {
@@ -87,6 +92,28 @@ public class Song {
     public void setSize(double size) {
         this.size = size;
     }
-    
-    
+
+    public File getSongfile() {
+        return songfile;
+    }
+
+    public void setSongfile(File songfile) {
+        this.songfile = songfile;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getFilelocation() {
+        return filelocation;
+    }
+
+    public void setFilelocation(String filelocation) {
+        this.filelocation = filelocation;
+    }
 }
