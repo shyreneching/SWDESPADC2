@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS `playlist`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `playlist` (
-  `idplaylist` int(11) NOT NULL,
+  `idplaylist` varchar(15) NOT NULL,
   `playlistname` varchar(45) DEFAULT NULL,
   `username` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idplaylist`)
@@ -71,7 +71,7 @@ DROP TABLE IF EXISTS `song`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `song` (
-  `idsong` int(11) NOT NULL,
+  `idsong` varchar(15) NOT NULL,
   `songname` varchar(45) DEFAULT NULL,
   `genre` varchar(45) DEFAULT NULL,
   `artist` varchar(45) DEFAULT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE `song` (
   `trackNumber` int(11) DEFAULT NULL,
   `length` int(11) DEFAULT NULL,
   `size` float DEFAULT NULL,
-  `songfile` blob,
+  `songfile` tinyblob NOT NULL,
   PRIMARY KEY (`idsong`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -126,4 +126,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-01 18:47:09
+-- Dump completed on 2019-03-01 21:12:16
