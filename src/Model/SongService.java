@@ -1,5 +1,7 @@
 package Model;
 
+import Mp3agic.*;
+
 import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -122,13 +124,14 @@ public class SongService {
                 s.setFilename(s.getArtist() + "-" + s.getName());
 
                 //gets the song from the databse and make put it in a File datatype
-                File theFile = new File(s.getArtist() + "-" + s.getName());
+                File theFile = new File(s.getArtist() + "-" + s.getName() + ".mp3");
                 OutputStream out = new FileOutputStream(theFile);
                 InputStream input = rs.getBinaryStream("songfile");
                 byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
                 while (input.read(buffer) > 0) {
                     out.write(buffer);
                 }
+
                 s.setSongfile(theFile);
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
@@ -254,10 +257,58 @@ public class SongService {
 
             statement.executeUpdate();
 
+            //edits the metadata of the song file itself
+            Mp3File mp3file = new Mp3File(s.getFilelocation());
+            if (mp3file.hasId3v1Tag()) {
+                mp3file.removeId3v1Tag();
+            }
+            if (mp3file.hasId3v2Tag()) {
+                mp3file.removeId3v2Tag();
+            }
+            if (mp3file.hasCustomTag()) {
+                mp3file.removeCustomTag();
+            }
+            ID3v1 id3v1Tag;
+            ID3v1Genres ID3v1genres;
+            /*if (mp3file.hasId3v1Tag()) {
+                id3v1Tag =  mp3file.getId3v1Tag();
+            } else {*/
+                // mp3 does not have an ID3v1 tag, let's create one..
+            ID3v2 id3v2Tag;
+            id3v2Tag = new ID3v24Tag();
+            mp3file.setId3v2Tag(id3v2Tag);
+            //}
+
+            id3v2Tag.setTrack(s.getTrackNumber() + "");
+            id3v2Tag.setArtist(s.getArtist());
+            id3v2Tag.setTitle(s.getName());
+            id3v2Tag.setAlbum(s.getAlbum());
+            id3v2Tag.setYear(s.getYear() + "");
+            id3v2Tag.setGenre(ID3v1Genres.matchGenreDescription(s.getGenre()));
+            /*id3v2Tag.setComment("Some comment");
+            id3v2Tag.setLyrics("Some lyrics");
+            id3v2Tag.setComposer("The Composer");
+            id3v2Tag.setPublisher("A Publisher");
+            id3v2Tag.setOriginalArtist("Another Artist");*/
+            id3v2Tag.setAlbumArtist(s.getArtist());
+            /*id3v2Tag.setCopyright("Copyright");
+            id3v2Tag.setUrl("http://foobar");
+            id3v2Tag.setEncoder("The Encoder");*/
+            mp3file.save(s.getFilename());
+
             return true;
+
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (NotSupportedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidDataException e) {
+            e.printStackTrace();
+        } catch (UnsupportedTagException e) {
             e.printStackTrace();
         } finally {
             if(statement != null) statement.close();
