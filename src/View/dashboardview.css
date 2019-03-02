@@ -1,0 +1,49 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+.text-field {
+    -fx-background-radius: 10, 9, 8;
+}
+
+#setting.button {
+    -fx-background-image: url("/files/kebab.png");
+}
+
+#upload.button {
+    -fx-background-image: url("/files/upload.png");
+}
+
+#next.button {
+    -fx-background-image: url("/files/next.png");
+}
+
+#prev.button {
+    -fx-background-image: url("/files/prev.png");
+}
+
+#play.button {
+    -fx-background-image: url("/files/play.png");
+}
+
+#search.button {
+    -fx-background-image: url("/files/search.png");
+}
+
+#profile.button {
+    -fx-background-image: url("/files/profile.png");    
+}
+
+#shuffle.button {
+    -fx-background-image: url("/files/shuffle.png");    
+}
+
+#repeat.button {
+    -fx-background-image: url("/files/repeat.png");    
+}
