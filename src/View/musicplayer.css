@@ -9,21 +9,25 @@
 }
 
 #home.button {
-    -fx-background-image: url("/files/logo1.png");
+    -fx-background-image: url("/Files/logo1.png");
 }
 
 #next.button {
-    -fx-background-image: url("/files/next.png");
+    -fx-background-image: url("/Files/next.png");
 }
 
 #prev.button {
-    -fx-background-image: url("/files/prev.png");
+    -fx-background-image: url("/Files/prev.png");
 }
 
 #shuffle.button {
-    -fx-background-image: url("/files/shuffle.png");
+    -fx-background-image: url("/Files/shuffle.png");
 }
 
 #repeat.button {
-    -fx-background-image: url("/files/repeat.png");
+    -fx-background-image: url("/Files/repeat.png");
+}
+
+#play.button {
+    -fx-background-image: url("/Files/play.png");
 }

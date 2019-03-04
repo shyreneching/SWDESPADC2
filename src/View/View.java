@@ -3,12 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package view;
+package View;
+
+import Controller.DashboardController;
 
 /**
  *
  * @author Stanley Sie
  */
-public interface View {
-    public void update();
+public abstract class View {
+    
+    protected DashboardController controller;
+    
+    public View() {
+        
+    }
+    
+    public View(DashboardController controller) {
+        this.controller = controller;
+    }
+    
+    abstract public void update();    
 }
