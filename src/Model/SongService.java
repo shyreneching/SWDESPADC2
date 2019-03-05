@@ -72,7 +72,7 @@ public class SongService {
                 s.setSize(rs.getFloat("size"));
                 s.setSize(rs.getFloat("size"));
                 // sets the name to "Artist-title"
-                s.setFilename(s.getArtist() + "-"+ s.getName());
+                s.setFilename(s.getArtist() + "-"+ s.getName()+ ".mp3");
 
                 //gets the song from the databse and make put it in a File datatype
                 File theFile = new File(s.getName());
@@ -156,7 +156,7 @@ public class SongService {
         Connection connection = db.getConnection();
         ArrayList<Song> songs = new ArrayList<>();
 
-        String query ="SELECT * FROM song WHERE idsong = '" + songname + "'";
+        String query ="SELECT * FROM song WHERE songname = '" + songname + "'";
         PreparedStatement statement = connection.prepareStatement(query);
         try {
 
@@ -174,7 +174,7 @@ public class SongService {
                 s.setSize(rs.getFloat("size"));
 
                 // sets the name to "Artist-title"
-                s.setFilename(s.getArtist() + "-"+ s.getName());
+                s.setFilename(s.getArtist() + "-"+ s.getName()+ ".mp3");
 
                 //gets the song from the databse and make put it in a File datatype
                 File theFile = new File(s.getName());
@@ -207,7 +207,7 @@ public class SongService {
 
     //pass the song id to delete the specific song
     public boolean delete(String songid) throws SQLException {
-        String query = "DELETE FROM song WHERE songid = ?";
+        String query = "DELETE FROM song WHERE idsong = ?";
         Connection connection = db.getConnection();
         PreparedStatement statement = connection.prepareStatement(query);
         try {
