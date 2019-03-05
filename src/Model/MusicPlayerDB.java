@@ -1,18 +1,15 @@
 package Model;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
-import java.lang.NullPointerException;
 
 
 public class MusicPlayerDB {
     public final static String DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
     public final static String URL = "jdbc:mysql://localhost:3306/";
     public final static String USERNAME = "root";
-    public final static String PASSWORD = "kitagawamizuki";
+    public final static String PASSWORD = "mysql2018";
     public final static String DATABASE = "MusicPlayer";
 
     public Connection getConnection(){
