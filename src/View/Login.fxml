@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="467.0" prefWidth="325.0" stylesheets="@login.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView fitHeight="217.0" fitWidth="260.0" layoutX="33.0" layoutY="-8.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../files/Muuuusick_logo_Circle.png" />
+         </image>
+      </ImageView>
+      <TextField alignment="CENTER" layoutX="40.0" layoutY="186.0" prefHeight="32.0" prefWidth="249.0" promptText="username">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Button fx:id="login" layoutX="96.0" layoutY="316.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="134.0" />
+      <Button fx:id="signup" layoutX="96.0" layoutY="382.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="134.0" />
+      <PasswordField alignment="CENTER" layoutX="40.0" layoutY="242.0" prefHeight="39.0" prefWidth="249.0" promptText="password">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </PasswordField>
+   </children>
+</AnchorPane>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="568.0" prefWidth="398.0" stylesheets="@login.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField layoutX="30.0" layoutY="221.0" prefHeight="40.0" prefWidth="157.0" promptText="First Name">
+         <font>
+            <Font name="Segoe UI" size="14.0" />
+         </font>
+      </TextField>
+      <TextField layoutX="209.0" layoutY="221.0" prefHeight="40.0" prefWidth="157.0" promptText="Last Name">
+         <font>
+            <Font name="Segoe UI" size="14.0" />
+         </font>
+      </TextField>
+      <TextField layoutX="30.0" layoutY="284.0" prefHeight="40.0" prefWidth="337.0" promptText="Email Address">
+         <font>
+            <Font name="Segoe UI" size="14.0" />
+         </font>
+      </TextField>
+      <Button fx:id="mainsignup" layoutX="132.0" layoutY="479.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="134.0" />
+      <PasswordField layoutX="30.0" layoutY="345.0" prefHeight="40.0" prefWidth="337.0" promptText="Password">
+         <font>
+            <Font name="Segoe UI" size="14.0" />
+         </font>
+      </PasswordField>
+      <PasswordField layoutX="30.0" layoutY="407.0" prefHeight="40.0" prefWidth="337.0" promptText="Confirm Password">
+         <font>
+            <Font name="Segoe UI" size="14.0" />
+         </font>
+      </PasswordField>
+      <ImageView fitHeight="217.0" fitWidth="260.0" layoutX="69.0" layoutY="-21.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../files/Muuuusick_logo_Circle.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="140.0" layoutY="157.0" prefHeight="29.0" prefWidth="134.0" text="Sign Up ">
+         <font>
+            <Font name="Segoe UI" size="32.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

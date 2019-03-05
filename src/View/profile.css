@@ -1,0 +1,49 @@
+#profile {
+    -fx-background-color: black;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+}
+
+#editusername.button {
+    -fx-background-image: url("/files/edit_button.png");
+}
+
+#editemail.button {
+    -fx-background-image: url("/files/edit_button.png");
+}
+
+#editpassword.button {
+    -fx-background-image: url("/files/edit_button.png");
+}
+
+#save.button {
+    -fx-background-image: url("/files/save_button.png");
+}
+
+#cancel.button {
+    -fx-background-image: url("/files/cancel_button.png");
+}
+
+#editusername.button:hover {
+    -fx-background-image: url("/files/edit_button_clicked.png");
+}
+
+#editemail.button:hover {
+    -fx-background-image: url("/files/edit_button_clicked.png");
+}
+
+#editpassword.button:hover {
+    -fx-background-image: url("/files/edit_button_clicked.png");
+}
+
+#save.button:hover {
+    -fx-background-image: url("/files/save_button_clicked.png");
+}
+
+#cancel.button:hover {
+    -fx-background-image: url("/files/cancel_button_clicked.png");
+}
