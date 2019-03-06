@@ -38,9 +38,56 @@ public class PlaylistService {
             return added;
         } catch (SQLException e){
             e.printStackTrace();
+        } finally {
+            if(statement != null) statement.close();
+            if(connection != null)  connection.close();
         }
         return false;
     }
+
+    //adds an arraylist of songs to the playlist
+    public boolean addSongsPlaylist(ArrayList<Song> songs, String playlistid) throws SQLException {
+        Connection connection = db.getConnection();
+        Boolean added = false;
+        String query2 = "INSERT INTO songcollection VALUE (?, ?)";
+        PreparedStatement statement2 = connection.prepareStatement(query2);
+        try {
+            for(Song s: songs) {
+                statement2.setString(1, playlistid);
+                statement2.setString(2, s.getSongid());
+
+                added = statement2.execute();
+            }
+
+            return added;
+        } catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(statement2 != null) statement2.close();
+            if(connection != null)  connection.close();
+        }
+        return false;
+    }
+
+    public boolean addSongPlaylist(Song s, String playlistid) throws SQLException {
+        Connection connection = db.getConnection();
+        String query = "INSERT INTO songcollection VALUE (?, ?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        try {
+            statement.setString(1, playlistid);
+            statement.setString(2, s.getSongid());
+            Boolean added = statement.execute();
+
+            return added;
+        } catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            if(statement != null) statement.close();
+            if(connection != null)  connection.close();
+        }
+        return false;
+    }
+
 
     //gets all the playlist in the parameter in an arraylist
     public ArrayList<Playlist> getAll() throws SQLException {
@@ -111,14 +158,16 @@ public class PlaylistService {
     }
 
     //gets one specific playlist with the playlistid
-    public Playlist getPlaylist(String playlistid) throws SQLException {
+    public Playlist getPlaylist(String playlistid, String username) throws SQLException {
         Connection connection = db.getConnection();
         ArrayList<Song> songs = new ArrayList<>();
         Playlist p = new Playlist();
 
         String query ="SELECT * FROM playlist WHERE idplaylist = '" + playlistid + "'";
         PreparedStatement statement = connection.prepareStatement(query);
-        String query2 ="SELECT * FROM songcollection INNER JOIN song ON idsong = idsong WHERE idplaylist = '" + playlistid + "'";
+        String query2 ="SELECT * FROM songcollection NATURAL JOIN song " +
+                "NATURAL JOIN usersong " +
+                "WHERE idplaylist = '" + playlistid + "' AND username = '" + username +"'";
         PreparedStatement statement2 = connection.prepareStatement(query2);
         try {
             ResultSet rs = statement.executeQuery();
@@ -154,6 +203,8 @@ public class PlaylistService {
                 s.setSongfile(theFile);
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
+                s.setTimesplayed(rs2.getInt("timesplayed"));
+                s.setUser(rs2.getString("username"));
                 songs = p.getSongs();
                 songs.add(s);
                 p.setSongs(songs);
@@ -173,14 +224,16 @@ public class PlaylistService {
     }
 
     //get playlist with the same name
-    public ArrayList<Playlist> getPlaylistName(String playlistname) throws SQLException {
+    public ArrayList<Playlist> getPlaylistName(String playlistname, String username) throws SQLException {
         Connection connection = db.getConnection();
         ArrayList <Playlist> playlists = new ArrayList<>();
         ArrayList <Song> songs;
 
         String query ="SELECT * FROM playlist WHERE playlistname = '" + playlistname + "'";
         PreparedStatement statement = connection.prepareStatement(query);
-        String query2 ="SELECT * FROM songcollection INNER JOIN song ON idsong = idsong";
+        String query2 ="SELECT * FROM songcollection NATURAL JOIN song " +
+                "NATURAL JOIN usersong " +
+                "WHERE playlistname = '" + playlistname + "' AND username = '" + username +"'";
         PreparedStatement statement2 = connection.prepareStatement(query2);
 
         try {
@@ -220,6 +273,8 @@ public class PlaylistService {
                 s.setSongfile(theFile);
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
+                s.setTimesplayed(rs2.getInt("timesplayed"));
+                s.setUser(rs2.getString("username"));
 
                 for(Playlist p : playlists){
                     if(p.getPlaylistid().compareTo(playlistid) == 0) {
@@ -251,25 +306,43 @@ public class PlaylistService {
         String query2 = "DELETE FROM songcollection WHERE idplaylist = ?";
         PreparedStatement statement2 = connection.prepareStatement(query2);
         try {
-
             statement.setString(1, playlistid);
             statement2.setString(1, playlistid);
-            boolean deleted  = statement.execute();
+            boolean deleted  = statement2.execute() && statement.execute();
             return deleted;
         } catch (SQLException e){
             e.printStackTrace();
         } finally {
             if(statement != null) statement.close();
+            if(statement2 != null) statement2.close();
             if(connection != null)  connection.close();
         }
         return false;
     }
 
-    //pass the songid of the song that wants to be change and song class with COMPLETE information including the updates
+    //deletes all the songs in the playlist, pass the playlistid as parameter
+    public boolean deleteAllSongsInPlaylist(String playlistid) throws SQLException {
+        Connection connection = db.getConnection();
+        String query2 = "DELETE FROM songcollection WHERE idplaylist = ?";
+        PreparedStatement statement2 = connection.prepareStatement(query2);
+        try {
+            statement2.setString(1, playlistid);
+            boolean deleted  = statement2.execute();
+            return deleted;
+        } catch (SQLException e){
+            e.printStackTrace();
+        } finally {
+            if(statement2 != null) statement2.close();
+            if(connection != null)  connection.close();
+        }
+        return false;
+    }
+
+    //pass the playlistid of the playlist that wants to be change and playlist class with COMPLETE information including the updates
     public boolean update(String playlistid, Playlist p) throws SQLException {
         Connection connection = db.getConnection();
 
-        String query = "UPDATE songplaylist, SET "
+        String query = "UPDATE playlist, SET "
                 + "playlistname = ?,"
                 + " WHERE playlist= ?";
 
@@ -278,6 +351,7 @@ public class PlaylistService {
             statement.setString(1, p.getName());
             statement.setString(2, p.getPlaylistid());
             statement.executeUpdate();
+            updatePlaylistSongs(playlistid, p);
             return true;
 
         } catch (SQLException e) {
@@ -286,6 +360,12 @@ public class PlaylistService {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        return false;
+    }
+
+    public boolean updatePlaylistSongs(String playlistid, Playlist p) throws SQLException {
+        deleteAllSongsInPlaylist(playlistid);
+        addSongsPlaylist(p.getSongs(), playlistid);
         return false;
     }
 

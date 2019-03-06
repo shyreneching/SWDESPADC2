@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class AccountService {
     private MusicPlayerDB db;
+    private PlaylistService ps;
 
     public AccountService(MusicPlayerDB db) {
         this.db = db;
@@ -70,13 +71,14 @@ public class AccountService {
         try {
 
             ResultSet rs = statement.executeQuery();
-            Account a = new Account();
-            a.setUsername(rs.getString("username"));
-            a.setPassword(rs.getString("password"));
-            a.setName(rs.getString("name"));
+            if(rs.next()) {
+                Account a = new Account();
+                a.setUsername(rs.getString("username"));
+                a.setPassword(rs.getString("password"));
+                a.setName(rs.getString("name"));
 
-            return a;
-
+                return a;
+            }
         } catch (SQLException e){
             e.printStackTrace();
         } finally {
@@ -89,25 +91,24 @@ public class AccountService {
     //pass the username of the account that you want to view the playlist
     public List<Playlist> getUserPlaylist(String username) throws SQLException {
         Connection connection = db.getConnection();
-        List <Playlist> property = new ArrayList<>();
+        List <Playlist> playlist = new ArrayList<>();
 
-        String query ="SELECT * FROM playlist INNER JOIN accounts ON username = username " +
-                "WHERE accounts.username = '" + username + "'";
+        String query ="SELECT * FROM playlist WHERE username = '" + username + "'";
         PreparedStatement statement = connection.prepareStatement(query);
         try {
 
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-
+                playlist.add(ps.getPlaylist(rs.getString("idplaylist")));
             }
-            return property;
+            return playlist;
         } catch (SQLException e){
             e.printStackTrace();
         } finally {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
-        return property;
+        return playlist;
     }
 
     //pass the username to delete an account
