@@ -1,3 +1,16 @@
+#login {
+    -fx-background-color: black;
+}
+
+#signup_pane {
+    -fx-background-color: black;
+}
+
+.text-field {
+    -fx-border-radius: 30;
+    -fx-background-radius: 30;
+}
+
 .button {
     -fx-background-color: transparent;
     -fx-background-position: center;
