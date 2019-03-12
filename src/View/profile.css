@@ -13,15 +13,11 @@
     -fx-background-size: 100%;
 }
 
-#editusername.button {
-    -fx-background-image: url("/Files/edit_button.png");
+#closeprofile.button {
+	-fx-background-image: url("/Files/close.png");
 }
 
-#editemail.button {
-    -fx-background-image: url("/Files/edit_button.png");
-}
-
-#editpassword.button {
+#editeverything.button {
     -fx-background-image: url("/Files/edit_button.png");
 }
 
@@ -33,15 +29,7 @@
     -fx-background-image: url("/Files/cancel_button.png");
 }
 
-#editusername.button:hover {
-    -fx-background-image: url("/Files/edit_button_clicked.png");
-}
-
-#editemail.button:hover {
-    -fx-background-image: url("/Files/edit_button_clicked.png");
-}
-
-#editpassword.button:hover {
+#editeverything.button:hover {
     -fx-background-image: url("/Files/edit_button_clicked.png");
 }
 

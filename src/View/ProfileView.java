@@ -10,13 +10,15 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import java.awt.*;
 import java.io.IOException;
 
 public class ProfileView extends View {
 
     @FXML
-    private Button editusername, editemail, editpassword, save, cancel;
+    private Button editeverything, save, cancel, closeprofile;
     @FXML
     private Label displayusername, displayemail, displaypassword;
     @FXML
@@ -27,47 +29,36 @@ public class ProfileView extends View {
     private Scene scene;
     private Parent root;
 
-    private ProfileView () {
+    public ProfileView () {
         try {
-            loader = new FXMLLoader(getClass().getResource("/View/SignUp.fxml"));
+            loader = new FXMLLoader(getClass().getResource("/View/Profile.fxml"));
             loader.setController(this);
             root = (Parent) loader.load();
             scene = new Scene(root);
 
-            stage.setTitle("Sign Up");
+            stage.setTitle("Profile");
             stage.setScene(scene);
             stage.setResizable(false);
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
+
         } catch (IOException ex) {
         }
     }
+    
 
     public void initialize () {
-        stage.setOnCloseRequest(event -> {
-            System.exit(0);
+        closeprofile.setOnAction(event -> {
+            stage.close();
         });
 
-        editemail.setOnAction(event -> {
+        editeverything.setOnAction(event -> {
             newemail.setVisible(true);
             newemail.setEditable(true);
-            save.setVisible(true);
-            save.setDisable(false);
-            cancel.setVisible(true);
-            cancel.setDisable(false);
-        });
-
-        editpassword.setOnAction(event -> {
-            newpassword.setVisible(true);
-            newpassword.setEditable(true);
-            save.setVisible(true);
-            save.setDisable(false);
-            cancel.setVisible(true);
-            cancel.setDisable(false);
-        });
-
-        editusername.setOnAction(event -> {
             newusername.setVisible(true);
             newusername.setEditable(true);
+            newpassword.setVisible(true);
+            newpassword.setEditable(true);
             save.setVisible(true);
             save.setDisable(false);
             cancel.setVisible(true);

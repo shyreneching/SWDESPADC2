@@ -10,6 +10,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import java.awt.*;
 import java.io.IOException;
 
@@ -21,7 +23,7 @@ public class LoginView extends View {
     @FXML
     private PasswordField password;
     @FXML
-    private Button login, signup;
+    private Button login, signup, closelogin;
     @FXML
     private Label unknownusername, incorrectpassword;
 
@@ -30,18 +32,21 @@ public class LoginView extends View {
     private Scene scene;
     private Parent root;
 
-    private LoginView () {
+    public LoginView (Stage stage) {
+    	this.stage = stage;
         //this.model = model;
-        try {
+    	try {
             loader = new FXMLLoader(getClass().getResource("/View/Login.fxml"));
             loader.setController(this);
             root = (Parent) loader.load();
+            System.out.println("test");
             scene = new Scene(root);
 
-            stage.setTitle("Login");
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.show();
+            this.stage.setTitle("Login");
+            this.stage.setScene(scene);
+            this.stage.setResizable(false);
+            this.stage.initStyle(StageStyle.UNDECORATED);
+            this.stage.show();
         } catch (IOException ie) {
         }
 
@@ -49,8 +54,8 @@ public class LoginView extends View {
     }
 
     public void initialize () {
-        stage.setOnCloseRequest(event -> {
-            System.exit(0);
+        closelogin.setOnAction(event -> {
+           stage.close();
         });
 
         login.setOnAction(event -> {
@@ -87,5 +92,4 @@ public class LoginView extends View {
         unknownusername.setVisible(false);
         incorrectpassword.setVisible(false);
     }
-
 }

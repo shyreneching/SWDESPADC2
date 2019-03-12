@@ -10,13 +10,15 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import java.awt.*;
 import java.io.IOException;
 
 public class SignupView extends View {
 
     @FXML
-    private Button mainsignup;
+    private Button mainsignup, closesignup;
     @FXML
     private Label emailwarn, passwordwarn1, passwordwarn2;
     @FXML
@@ -29,24 +31,26 @@ public class SignupView extends View {
     private Scene scene;
     private Parent root;
 
-    private SignupView (){
+    public SignupView (){
         try {
             loader = new FXMLLoader(getClass().getResource("/View/SignUp.fxml"));
             loader.setController(this);
             root = (Parent) loader.load();
             scene = new Scene(root);
 
+            stage = new Stage();
             stage.setTitle("Sign Up");
             stage.setScene(scene);
             stage.setResizable(false);
+            stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
         } catch (IOException ex) {
         }
     }
 
     private void initialize () {
-        stage.setOnCloseRequest(event -> {
-            System.exit(0);
+        closesignup.setOnAction(event -> {
+            stage.close();
         });
 
         mainsignup.setOnAction(event -> {
@@ -59,4 +63,10 @@ public class SignupView extends View {
         passwordwarn1.setVisible(false);
         passwordwarn2.setVisible(false);
     }
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
 }

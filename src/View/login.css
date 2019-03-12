@@ -17,12 +17,20 @@
     -fx-background-size: 100%;
 }
 
+#closelogin.button {
+	-fx-background-image: url("/Files/close.png");	
+}
+
+#closesignup.button {
+	-fx-background-image: url("/Files/close.png");	
+}
+
 #login.button {
     -fx-background-image: url("/Files/login_button.png");
 }
 
 #signup.button {
-    -fx-background-image: url("/Files/signup_button.png");
+    -fx-background-image: url("/Files/signup_button_red-black.png");
 }
 
 #login.button:hover {
@@ -30,11 +38,11 @@
 }
 
 #signup.button:hover {
-    -fx-background-image: url("/Files/signup_button_black.png");
+    -fx-background-image: url("/Files/signup_button_red-black_clicked.png");
 }
 
 #mainsignup.button {
-    -fx-background-image: url("/Files/signup_button_black.png");
+    -fx-background-image: url("/Files/signup_button.png");
 }
 
 #mainsignup.button:hover {
