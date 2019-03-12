@@ -1,38 +1,54 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Model;
 
-import View.MusicPlayerView;
 
-/**
- *
- * @author Stanley Sie
- */
-public class MusicPlayer extends Model {
+import java.util.ArrayList;
+
+public class MusicPlayer {
     
+    private Account user;
+    private ArrayList<Song> songs;
+    private ArrayList<Playlist> groups;
     private int repeat; //0 - no repeat, 1 - repeat all, 2 - repeat 1 song
     private boolean shuffle;
-    private Playlist currentPlaylist;
-    private Song currentSong;
 
-    public MusicPlayer() {
-        
+
+    public boolean login(String username, String password){
+
+
+        return false;
     }
-    
-    public MusicPlayer(MusicPlayerView view) {
-        super.attach(view);
+
+    public Account getUser() {
+        return user;
     }
-    
+
+    public void setUser(Account user) {
+        this.user = user;
+    }
+
+    public ArrayList<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(ArrayList<Song> songs) {
+        this.songs = songs;
+    }
+
+    public ArrayList<Playlist> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(ArrayList<Playlist> groups) {
+        this.groups = groups;
+    }
+
     public int getRepeat() {
         return repeat;
     }
 
     public void setRepeat(int repeat) {
         this.repeat = repeat;
-        super.notifyView();
     }
 
     public boolean isShuffle() {
@@ -41,24 +57,5 @@ public class MusicPlayer extends Model {
 
     public void setShuffle(boolean shuffle) {
         this.shuffle = shuffle;
-        super.notifyView();
-    }
-
-    public Playlist getCurrentPlaylist() {
-        return currentPlaylist;
-    }
-
-    public void setCurrentPlaylist(Playlist currentPlaylist) {
-        this.currentPlaylist = currentPlaylist;
-        super.notifyView();
-    }
-
-    public Song getCurrentSong() {
-        return currentSong;
-    }
-
-    public void setCurrentSong(Song currentSong) {
-        this.currentSong = currentSong;
-        super.notifyView();
     }
 }

@@ -1,11 +1,19 @@
 package Model;
 
-import java.util.ArrayList;
+import javafx.collections.ObservableList;
 
 public class Playlist {
     
-    private String name;
-    private ArrayList<Song> songs;
+    private String playlistid, name;
+    private ObservableList<Song> songs;
+
+    public String getPlaylistid() {
+        return playlistid;
+    }
+
+    public void setPlaylistid(String playlistid) {
+        this.playlistid = playlistid;
+    }
 
     public String getName() {
         return name;
@@ -15,11 +23,11 @@ public class Playlist {
         this.name = name;
     }
     
-    public ArrayList<Song> getSongs() {
+    public ObservableList<Song> getSongs() {
         return songs;
     }
 
-    public void setSongs(ArrayList<Song> songs) {
+    public void setSongs(ObservableList<Song> songs) {
         this.songs = songs;
     }
     

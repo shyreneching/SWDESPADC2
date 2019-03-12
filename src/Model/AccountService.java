@@ -99,7 +99,7 @@ public class AccountService {
 
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                playlist.add(ps.getPlaylist(rs.getString("idplaylist")));
+                playlist.add(ps.getPlaylist(rs.getString("idplaylist"), username));
             }
             return playlist;
         } catch (SQLException e){

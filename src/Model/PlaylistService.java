@@ -1,5 +1,8 @@
 package Model;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,7 +25,7 @@ public class PlaylistService {
         String query2 = "INSERT INTO songcollection VALUE (?, ?)";
         PreparedStatement statement2 = connection.prepareStatement(query2);
 
-        ArrayList<Song> songs = p.getSongs();
+        ObservableList<Song> songs = p.getSongs();
         try {
             statement.setString(1, p.getPlaylistid());
             statement.setString(2, p.getName());
@@ -46,7 +49,7 @@ public class PlaylistService {
     }
 
     //adds an arraylist of songs to the playlist
-    public boolean addSongsPlaylist(ArrayList<Song> songs, String playlistid) throws SQLException {
+    public boolean addSongsPlaylist(ObservableList<Song> songs, String playlistid) throws SQLException {
         Connection connection = db.getConnection();
         Boolean added = false;
         String query2 = "INSERT INTO songcollection VALUE (?, ?)";
@@ -93,7 +96,7 @@ public class PlaylistService {
     public ArrayList<Playlist> getAll() throws SQLException {
         Connection connection = db.getConnection();
         ArrayList <Playlist> playlists = new ArrayList<>();
-        ArrayList <Song> songs;
+        ObservableList <Song> songs;
 
         String query ="SELECT * FROM playlist";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -105,7 +108,7 @@ public class PlaylistService {
                 Playlist p = new Playlist();
                 p.setPlaylistid(rs.getString("idplaylist"));
                 p.setName(rs.getString("playlistname"));
-                p.setSongs(new ArrayList<Song>());
+                p.setSongs(FXCollections.observableArrayList());
                 playlists.add(p);
             }
 
@@ -141,7 +144,7 @@ public class PlaylistService {
                     if(p.getPlaylistid().compareTo(playlistid) == 0) {
                         songs = p.getSongs();
                         songs.add(s);
-                        p.setSongs(songs);
+                        p.setSongs(FXCollections.observableArrayList());
                     }
                 }
             }
@@ -160,7 +163,7 @@ public class PlaylistService {
     //gets one specific playlist with the playlistid
     public Playlist getPlaylist(String playlistid, String username) throws SQLException {
         Connection connection = db.getConnection();
-        ArrayList<Song> songs = new ArrayList<>();
+        ObservableList<Song> songs;
         Playlist p = new Playlist();
 
         String query ="SELECT * FROM playlist WHERE idplaylist = '" + playlistid + "'";
@@ -174,7 +177,7 @@ public class PlaylistService {
             if(rs.next()) {
                 p.setPlaylistid(rs.getString("idplaylist"));
                 p.setName(rs.getString("playlistname"));
-                p.setSongs(new ArrayList<Song>());
+                p.setSongs(FXCollections.observableArrayList());
             }
 
             ResultSet rs2 = statement2.executeQuery();
@@ -227,7 +230,7 @@ public class PlaylistService {
     public ArrayList<Playlist> getPlaylistName(String playlistname, String username) throws SQLException {
         Connection connection = db.getConnection();
         ArrayList <Playlist> playlists = new ArrayList<>();
-        ArrayList <Song> songs;
+        ObservableList <Song> songs;
 
         String query ="SELECT * FROM playlist WHERE playlistname = '" + playlistname + "'";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -242,7 +245,7 @@ public class PlaylistService {
                 Playlist p = new Playlist();
                 p.setPlaylistid(rs.getString("idplaylist"));
                 p.setName(rs.getString("playlistname"));
-                p.setSongs(new ArrayList<Song>());
+                p.setSongs(FXCollections.observableArrayList());
                 playlists.add(p);
             }
 

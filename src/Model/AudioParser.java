@@ -1,6 +1,10 @@
 package Model;
+
+import Mp3agic.*;
+
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.sql.SQLException;
 import java.sql.SQLOutput;
 
 import org.apache.tika.exception.TikaException;
@@ -12,12 +16,9 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-
 import javax.imageio.ImageIO;
 
 public class AudioParser {
-
-
 
     public Song getSongDetails(String location){
         String fileLocation = location;
@@ -69,6 +70,23 @@ public class AudioParser {
         return s;
     }
 
+    // Returns the album art of the song in File Format
+    // Need to pass song with album art
+    // Returns null if no album art
+    public File getSongImage(Song s) throws InvalidDataException, IOException, UnsupportedTagException {
+        Mp3File music = new Mp3File(s.getFilelocation());
+        File outputfile = new File(s.getName() + ".jpg");
+        if (music.hasId3v2Tag()){
+            ID3v2 id3v2tag = music.getId3v2Tag();
+            byte[] imageData = id3v2tag.getAlbumImage();
+            //converting the bytes to an image
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
+            ImageIO.write(img, "jpg", outputfile);
+            return outputfile;
+        }
+         return null;
+    }
+
     /**
      * @param args
      */
@@ -77,14 +95,6 @@ public class AudioParser {
         String fileLocation = "C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3";
 
         try {
-
-            /*Mp3File song = new Mp3File(fileLocation);
-            if (song.hasId3v2Tag()){
-                ID3v2 id3v2tag = song.getId3v2Tag();
-                byte[] imageData = id3v2tag.getAlbumImage();
-                //converting the bytes to an image
-                BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
-            }*/
 
             InputStream input = new FileInputStream(new File(fileLocation));
             ContentHandler handler = new DefaultHandler();
@@ -120,6 +130,63 @@ public class AudioParser {
             Song s = ap.getSongDetails("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
             System.out.println(s.getLength());
 
+            MusicPlayerDB db = new MusicPlayerDB();
+            SongService ss = new SongService(db);
+            //s.setSongid("S01");
+            //s.setFilelocation("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
+            //s.setSongfile(new File(fileLocation));
+            //ss.add(s);
+            Song song =  ss.getSong("S01", "A01");
+            File f = song.getSongfile();
+            System.out.println(f.getName());
+
+            Mp3File music = new Mp3File(song.getFilelocation());
+            if (music.hasId3v2Tag()){
+                ID3v2 id3v2tag = music.getId3v2Tag();
+                byte[] imageData = id3v2tag.getAlbumImage();
+                //converting the bytes to an image
+                BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
+                File outputfile = new File("image.jpg");
+                ImageIO.write(img, "jpg", outputfile);
+            }
+
+
+
+            Mp3File mp3file = new Mp3File(song.getFilelocation());
+            if (mp3file.hasId3v1Tag()) {
+                mp3file.removeId3v1Tag();
+            }
+            if (mp3file.hasId3v2Tag()) {
+                mp3file.removeId3v2Tag();
+            }
+            if (mp3file.hasCustomTag()) {
+                mp3file.removeCustomTag();
+            }
+            ID3v2 id3v2Tag;
+            id3v2Tag = new ID3v24Tag();
+            mp3file.setId3v2Tag(id3v2Tag);
+
+            id3v2Tag.setTrack("5");
+            id3v2Tag.setArtist("Taeyeon");
+            id3v2Tag.setTitle("The Title");
+            id3v2Tag.setAlbum("The Album");
+            id3v2Tag.setYear("2001");
+            id3v2Tag.setGenre(12);
+            id3v2Tag.setComment("Some comment");
+            id3v2Tag.setLyrics("Some lyrics");
+            id3v2Tag.setComposer("The Composer");
+            id3v2Tag.setPublisher("A Publisher");
+            id3v2Tag.setOriginalArtist("Another Artist");
+            id3v2Tag.setAlbumArtist("An Artist");
+            id3v2Tag.setCopyright("Copyright");
+            id3v2Tag.setUrl("http://foobar");
+            id3v2Tag.setEncoder("The Encoder");
+            ID3v2 id3v2tag = music.getId3v2Tag();
+            byte[] imageData = id3v2tag.getAlbumImage();
+            id3v2Tag.setAlbumImage(imageData, ".jpg");
+            mp3file.save("MyMp3File.mp3");
+
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -128,7 +195,14 @@ public class AudioParser {
             e.printStackTrace();
         } catch (TikaException e) {
             e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedTagException e) {
+            e.printStackTrace();
+        } catch (InvalidDataException e) {
+            e.printStackTrace();
+        } catch (NotSupportedException e) {
+            e.printStackTrace();
         }
-
     }
 }
