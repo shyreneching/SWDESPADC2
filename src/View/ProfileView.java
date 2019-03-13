@@ -1,6 +1,7 @@
 package View;
 
 import javafx.fxml.FXML;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -22,7 +23,9 @@ public class ProfileView extends View {
     @FXML
     private Label displayusername, displayemail, displaypassword;
     @FXML
-    private TextField newusername, newemail, newpassword;
+    private TextField newusername, newfullname;
+    @FXML
+    private PasswordField newpassword;
 
     private FXMLLoader loader;
     private Stage stage;
@@ -53,8 +56,8 @@ public class ProfileView extends View {
         });
 
         editeverything.setOnAction(event -> {
-            newemail.setVisible(true);
-            newemail.setEditable(true);
+            newfullname.setVisible(true);
+            newfullname.setEditable(true);
             newusername.setVisible(true);
             newusername.setEditable(true);
             newpassword.setVisible(true);
@@ -66,19 +69,19 @@ public class ProfileView extends View {
         });
 
         save.setOnAction(event -> {
-
+        	stage.close();
         });
 
         cancel.setOnAction(event -> {
-
+        	stage.close();
         });
     }
 
     private void init () {
-        newemail.setVisible(false);
+        newfullname.setVisible(false);
         newusername.setVisible(false);
         newpassword.setVisible(false);
-        newemail.setEditable(false);
+        newfullname.setEditable(false);
         newusername.setEditable(false);
         newpassword.setEditable(false);
         save.setVisible(false);

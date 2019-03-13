@@ -1,6 +1,7 @@
 package View;
 
 import javafx.fxml.FXML;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -20,9 +21,9 @@ public class SignupView extends View {
     @FXML
     private Button mainsignup, closesignup;
     @FXML
-    private Label emailwarn, passwordwarn1, passwordwarn2;
+    private Label usernamewarn, passwordwarn1, passwordwarn2;
     @FXML
-    private TextField firstname, lastname, email;
+    private TextField firstname, lastname, username;
     @FXML
     private PasswordField password, conpassword;
 
@@ -31,7 +32,7 @@ public class SignupView extends View {
     private Scene scene;
     private Parent root;
 
-    public SignupView (){
+    public SignupView (FacadeModel model){
         try {
             loader = new FXMLLoader(getClass().getResource("/View/SignUp.fxml"));
             loader.setController(this);
@@ -54,12 +55,12 @@ public class SignupView extends View {
         });
 
         mainsignup.setOnAction(event -> {
-
+        	stage.close();
         });
     }
 
     private void init () {
-        emailwarn.setVisible(false);
+        usernamewarn.setVisible(false);
         passwordwarn1.setVisible(false);
         passwordwarn2.setVisible(false);
     }
