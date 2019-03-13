@@ -92,4 +92,9 @@ public class LoginView extends View {
         unknownusername.setVisible(false);
         incorrectpassword.setVisible(false);
     }
+
+    @Override
+    public void update() {
+
+    }
 }

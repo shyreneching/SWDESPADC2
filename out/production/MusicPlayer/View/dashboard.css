@@ -1,0 +1,90 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.text-field {
+    -fx-background-radius: 10, 9, 8;
+}
+
+#edit.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+    -fx-background-image: url("/Files/edit.png");
+}
+
+#delete.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+    -fx-background-image: url("/Files/delete.png");
+}
+
+#upload.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+    -fx-background-image: url("/Files/upload.png");
+}
+
+#profile.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+    -fx-background-image: url("/Files/profile.png");    
+}
+
+#search.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+    -fx-background-image: url("/Files/search.png");
+}
+
+#artists.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+#playlists.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+#newPlaylist.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+#tracks.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+#genres.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+#albums.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+#starred.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
+
+#musicPlayer.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-color: transparent;
+}
