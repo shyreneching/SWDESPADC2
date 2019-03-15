@@ -13,13 +13,13 @@ import View.View;
  */
 public class Model {
     
-    private View observer;
+    private View view;
     
-    public void attach(View observer) {
-        this.observer = observer;
+    public void attach(View view) {
+        this.view = view;
     }
     
-    public void notifyView() {
-        observer.update();
+    public void update() {
+        view.update();
     }
 }

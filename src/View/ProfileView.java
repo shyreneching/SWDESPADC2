@@ -48,7 +48,12 @@ public class ProfileView extends View {
         } catch (IOException ex) {
         }
     }
-    
+
+    @Override
+    public void update() {
+
+    }
+
 
     public void initialize () {
         closeprofile.setOnAction(event -> {

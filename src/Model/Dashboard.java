@@ -32,7 +32,7 @@ public class Dashboard extends Model {
 
     public void setCurrentSong(Song currentSong) {
         this.currentSong = currentSong;
-        super.notifyView();
+//        super.notifyView();
     }
     
     public Account getUser() {
@@ -41,7 +41,7 @@ public class Dashboard extends Model {
 
     public void setUser(Account user) {
         this.user = user;
-        super.notifyView();
+//        super.notifyView();
     }
 
     public ArrayList<Song> getSongs() {
@@ -50,7 +50,7 @@ public class Dashboard extends Model {
 
     public void setSongs(ArrayList<Song> songs) {
         this.songs = songs;
-        super.notifyView();
+//        super.notifyView();
     }
 
     public ArrayList<Playlist> getGroups() {
@@ -59,7 +59,7 @@ public class Dashboard extends Model {
 
     public void setGroups(ArrayList<Playlist> groups) {
         this.groups = groups;
-        super.notifyView();
+//        super.notifyView();
     } 
     
     public Dashboard getState() {

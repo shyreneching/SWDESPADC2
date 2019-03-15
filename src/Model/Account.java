@@ -1,12 +1,13 @@
 package Model;
 
-import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Account {
     
     private String username, password, name;
-    private ArrayList<Playlist> playlists;
-    private ArrayList<Song> songs;
+    private ObservableList<Playlist> playlists;
+    private ObservableList<Song> songs;
 
     public Account(){
 
@@ -16,8 +17,8 @@ public class Account {
         this.name = name;
         this.username = username;
         this.password = password;
-        playlists = new ArrayList<>();
-        songs = new ArrayList<>();
+        playlists = FXCollections.observableArrayList();
+        songs = FXCollections.observableArrayList();
     }
     
     public String getUsername() {
@@ -44,19 +45,19 @@ public class Account {
         this.name = name;
     }
 
-    public ArrayList<Playlist> getPlaylists() {
+    public ObservableList<Playlist> getPlaylists() {
         return playlists;
     }
 
-    public void setPlaylists(ArrayList<Playlist> playlists) {
+    public void setPlaylists(ObservableList<Playlist> playlists) {
         this.playlists = playlists;
     }
 
-    public ArrayList<Song> getSongs() {
+    public ObservableList<Song> getSongs() {
         return songs;
     }
 
-    public void setSongs(ArrayList<Song> songs) {
+    public void setSongs(ObservableList<Song> songs) {
         this.songs = songs;
     }
     
