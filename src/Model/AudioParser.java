@@ -4,6 +4,7 @@ import Mp3agic.*;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.sql.SQLOutput;
 
@@ -20,14 +21,22 @@ import javax.imageio.ImageIO;
 
 public class AudioParser {
 
-    public static final String file = "C:/Users/erwin/Desktop/Night in the Woods Discography/2017 - Night in the Woods Vol. 1 At The End Of Everything/Alec Holowka - Dusk Stars.mp3";
-
+    /*Sets
+    * song name
+    * song artist
+    * song album
+    * song genre
+    * song release date
+    * song tracknumber
+    * song duration
+    * song location
+    * song filename
+    * */
     public Song getSongDetails(String location){
         String fileLocation = location;
         Song s = new Song();
 
         try {
-
             InputStream input = new FileInputStream(new File(fileLocation));
             ContentHandler handler = new DefaultHandler();
             Metadata metadata = new Metadata();
@@ -50,15 +59,15 @@ public class AudioParser {
             s.setArtist(metadata.get("xmpDM:artist"));
             s.setAlbum(metadata.get("xmpDM:album"));
             s.setGenre(metadata.get("xmpDM:genre"));
-            if(!metadata.get("xmpDM:releaseDate").equals(""))
+            if (!(metadata.get("xmpDM:releaseDate").equals("")))
                 s.setYear(Integer.parseInt(metadata.get("xmpDM:releaseDate")));
-            if(metadata.get("xmpDM:trackNumber") != null)
-                s.setTrackNumber(Integer.parseInt(metadata.get("xmpDM:trackNumber")));
+            if (!(metadata.get("xmpDM:trackNumber").equals("")) || metadata.get("xmpDM:trackNumber") != null)
+            s.setTrackNumber(Integer.parseInt(metadata.get("xmpDM:trackNumber")));
             Double d = Double.parseDouble(metadata.get("xmpDM:duration"));
             d =  d/1000;
             s.setLength(d.intValue());
-
-
+            s.setFilelocation(location);
+            s.setFilename(s.getArtist() + "-" + s.getName()+ ".mp3");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -69,8 +78,6 @@ public class AudioParser {
         } catch (TikaException e) {
             e.printStackTrace();
         }
-
-
         return s;
     }
 
@@ -79,27 +86,107 @@ public class AudioParser {
     // Returns null if no album art
     public File getSongImage(Song s) throws InvalidDataException, IOException, UnsupportedTagException {
         Mp3File music = new Mp3File(s.getFilelocation());
-        File outputfile = new File(s.getName() + ".jpg");
+        File outputfile = new File(s.getArtist() + "_" + s.getAlbum() + ".jpg");
         if (music.hasId3v2Tag()){
             ID3v2 id3v2tag = music.getId3v2Tag();
             byte[] imageData = id3v2tag.getAlbumImage();
-            //converting the bytes to an image
-            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
-            ImageIO.write(img, "jpg", outputfile);
-            return outputfile;
+            if (imageData != null){
+                //converting the bytes to an image
+                BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageData));
+                ImageIO.write(img, "jpg", outputfile);
+                return outputfile;
+            }
+            else{
+                //set default picture
+            }
         }
          return null;
     }
+
+    public Song setSongImage(Song s, File image) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
+        Mp3File mp3file = new Mp3File(s.getFilelocation());
+        ID3v2 id3v2Tag;
+        id3v2Tag = new ID3v24Tag();
+        mp3file.setId3v2Tag(id3v2Tag);
+        byte[] imageData = Files.readAllBytes(image.toPath());
+        id3v2Tag.setAlbumImage(imageData, ".jpg");
+        id3v2Tag.setTrack(s.getTrackNumber() + "");
+        id3v2Tag.setArtist(s.getArtist());
+        id3v2Tag.setTitle(s.getName());
+        id3v2Tag.setAlbum(s.getAlbum());
+        id3v2Tag.setYear(s.getYear() + "");
+        id3v2Tag.setGenre(ID3v1Genres.matchGenreDescription(s.getGenre()));
+        /*id3v2Tag.setComment("Some comment");
+        id3v2Tag.setLyrics("Some lyrics");
+        id3v2Tag.setComposer("The Composer");
+        id3v2Tag.setPublisher("A Publisher");
+        id3v2Tag.setOriginalArtist("Another Artist");*/
+        id3v2Tag.setAlbumArtist(s.getArtist());
+        //temporarily sets the file name to "temp.mp3"
+        mp3file.save("temp.mp3");
+        //gets the old file and deletes it
+        File file = new File("../MusicPlayer/" + s.getFilename());
+        if (file != null)
+            file.delete();
+        //renames the temp file to the actual file
+        File tempfile =new File("../MusicPlayer/temp.mp3");
+        File newfile =new File("../MusicPlayer/" + s.getFilename());
+        s.setSongfile(tempfile);
+        tempfile.renameTo(newfile);
+        return s;
+    }
+
+    public Song editSongDetails(Song original, Song changed) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
+        Mp3File mp3file = new Mp3File(original.getFilelocation());
+        ID3v2 id3v2Tag;
+        id3v2Tag = new ID3v24Tag();
+        mp3file.setId3v2Tag(id3v2Tag);
+        byte[] imageData = Files.readAllBytes(getSongImage(original).toPath());
+
+        if (mp3file.hasId3v1Tag()) {
+            mp3file.removeId3v1Tag();
+        }
+        if (mp3file.hasId3v2Tag()) {
+            mp3file.removeId3v2Tag();
+        }
+        if (mp3file.hasCustomTag()) {
+            mp3file.removeCustomTag();
+        }
+
+        id3v2Tag.setAlbumImage(imageData, ".jpg");
+        id3v2Tag.setTrack(changed.getTrackNumber() + "");
+        id3v2Tag.setArtist(changed.getArtist());
+        id3v2Tag.setTitle(changed.getName());
+        id3v2Tag.setAlbum(changed.getAlbum());
+        id3v2Tag.setYear(changed.getYear() + "");
+        id3v2Tag.setGenre(ID3v1Genres.matchGenreDescription(changed.getGenre()));
+        /*id3v2Tag.setComment("Some comment");
+        id3v2Tag.setLyrics("Some lyrics");
+        id3v2Tag.setComposer("The Composer");
+        id3v2Tag.setPublisher("A Publisher");
+        id3v2Tag.setOriginalArtist("Another Artist");*/
+        id3v2Tag.setAlbumArtist(changed.getArtist());
+        //temporarily sets the file name to "temp.mp3"
+        mp3file.save("temp.mp3");
+
+        //takes the file again, place it in a song file and delete the mp3 file
+        File file = new File("../MusicPlayer/temp.mp3");
+        Song s = getSongDetails("../MusicPlayer/temp.mp3");
+        s.setSongfile(file);
+        s.setUser(changed.getUser());
+        file.delete();
+        return s;
+    }
+
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-
-        String fileLocation = file;
+        AudioParser ap = new AudioParser();
+        String fileLocation = "C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3";
 
         try {
-
             InputStream input = new FileInputStream(new File(fileLocation));
             ContentHandler handler = new DefaultHandler();
             Metadata metadata = new Metadata();
@@ -130,18 +217,18 @@ public class AudioParser {
             System.out.println("Duration : "+ (int)i);
 
 
-            AudioParser ap = new AudioParser();
-            Song s = ap.getSongDetails(file);
+
+            Song s = ap.getSongDetails("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
             System.out.println(s.getLength());
 
             MusicPlayerDB db = new MusicPlayerDB();
             SongService ss = new SongService(db);
-            s.setSongid("S02");
-            s.setFilelocation(file);
-            s.setSongfile(new File(fileLocation));
-            s.setUser("Le User");
-            ss.add(s);
-            Song song =  ss.getSong("S02", "Le User");
+            //s.setSongid("S01");
+            //s.setFilelocation("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
+            //s.setSongfile(new File(fileLocation));
+            //s.setUser("A01");
+            //ss.add(s);
+            Song song =  ss.getSong("S01", "A01");
             File f = song.getSongfile();
             System.out.println(f.getName());
 
@@ -157,39 +244,57 @@ public class AudioParser {
 
 
 
-//            Mp3File mp3file = new Mp3File(song.getFilelocation());
-//            if (mp3file.hasId3v1Tag()) {
-//                mp3file.removeId3v1Tag();
-//            }
-//            if (mp3file.hasId3v2Tag()) {
-//                mp3file.removeId3v2Tag();
-//            }
-//            if (mp3file.hasCustomTag()) {
-//                mp3file.removeCustomTag();
-//            }
-//            ID3v2 id3v2Tag;
-//            id3v2Tag = new ID3v24Tag();
-//            mp3file.setId3v2Tag(id3v2Tag);
-//
-//            id3v2Tag.setTrack("5");
-//            id3v2Tag.setArtist("Taeyeon");
-//            id3v2Tag.setTitle("The Title");
-//            id3v2Tag.setAlbum("The Album");
-//            id3v2Tag.setYear("2001");
-//            id3v2Tag.setGenre(12);
-//            id3v2Tag.setComment("Some comment");
-//            id3v2Tag.setLyrics("Some lyrics");
-//            id3v2Tag.setComposer("The Composer");
-//            id3v2Tag.setPublisher("A Publisher");
-//            id3v2Tag.setOriginalArtist("Another Artist");
-//            id3v2Tag.setAlbumArtist("An Artist");
-//            id3v2Tag.setCopyright("Copyright");
-//            id3v2Tag.setUrl("http://foobar");
-//            id3v2Tag.setEncoder("The Encoder");
-//            ID3v2 id3v2tag = music.getId3v2Tag();
-//            byte[] imageData = id3v2tag.getAlbumImage();
-//            id3v2Tag.setAlbumImage(imageData, ".jpg");
-//            mp3file.save("MyMp3File.mp3");
+            Mp3File mp3file = new Mp3File(song.getFilelocation());
+            if (mp3file.hasId3v1Tag()) {
+                mp3file.removeId3v1Tag();
+            }
+            if (mp3file.hasId3v2Tag()) {
+                mp3file.removeId3v2Tag();
+            }
+            if (mp3file.hasCustomTag()) {
+                mp3file.removeCustomTag();
+            }
+            ID3v2 id3v2Tag;
+            id3v2Tag = new ID3v24Tag();
+            mp3file.setId3v2Tag(id3v2Tag);
+
+            id3v2Tag.setTrack("5");
+            id3v2Tag.setArtist("Taeyeon");
+            id3v2Tag.setTitle("The Title");
+            id3v2Tag.setAlbum("The Album");
+            id3v2Tag.setYear("2001");
+            id3v2Tag.setGenre(12);
+            id3v2Tag.setComment("Some comment");
+            id3v2Tag.setLyrics("Some lyrics");
+            id3v2Tag.setComposer("The Composer");
+            id3v2Tag.setPublisher("A Publisher");
+            id3v2Tag.setOriginalArtist("Another Artist");
+            id3v2Tag.setAlbumArtist("An Artist");
+            id3v2Tag.setCopyright("Copyright");
+            id3v2Tag.setUrl("http://foobar");
+            id3v2Tag.setEncoder("The Encoder");
+            ID3v2 id3v2tag = music.getId3v2Tag();
+            byte[] imageData = id3v2tag.getAlbumImage();
+            id3v2Tag.setAlbumImage(imageData, ".jpg");
+            mp3file.save("MyMp3File.mp3");
+
+            File newFile = new File("C:/Users/Shyrene/IdeaProjects/MusicPlayer/(G)I-DLE - Senorita.mp3");
+
+            Song sounds = ap.getSongDetails(newFile.getAbsolutePath());
+            sounds.setSongfile(newFile);
+            sounds.setFilelocation(newFile.getAbsolutePath());
+            sounds.setFilename(sounds.getArtist() + "-" + sounds.getName());
+            ap.getSongImage(sounds);
+            /*InputStream ios = new FileInputStream(ap.getSongImage(sounds));
+            byte[] fileContent = Files.readAllBytes(ap.getSongImage(sounds).toPath());
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(fileContent));
+            ImageIO.write(image, "jpg", newFile);*/
+
+            File ff = new File("../MusicPlayer/MyMp3File.mp3");
+            Song newsong = ap.getSongDetails("C:/Users/Shyrene/IdeaProjects/MusicPlayer/MyMp3File.mp3");
+            newsong.setFilename("MyMp3File.mp3");
+            Song soo = ap.setSongImage(newsong, ap.getSongImage(sounds));
+            System.out.println(soo.getFilename());
 
 
         } catch (FileNotFoundException e) {
@@ -202,15 +307,11 @@ public class AudioParser {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
-        } /*catch (UnsupportedTagException e) {
+        } catch (UnsupportedTagException e) {
             e.printStackTrace();
         } catch (InvalidDataException e) {
             e.printStackTrace();
         } catch (NotSupportedException e) {
-            e.printStackTrace();
-        }*/ catch (InvalidDataException e) {
-            e.printStackTrace();
-        } catch (UnsupportedTagException e) {
             e.printStackTrace();
         }
     }

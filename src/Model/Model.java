@@ -5,7 +5,7 @@
  */
 package Model;
 
-import View.View;
+//import View.View;
 
 /**
  *
@@ -13,7 +13,7 @@ import View.View;
  */
 public class Model {
     
-    private View view;
+    /*private View view;
     
     public void attach(View view) {
         this.view = view;
@@ -21,5 +21,5 @@ public class Model {
     
     public void update() {
         view.update();
-    }
+    }*/
 }

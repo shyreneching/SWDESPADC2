@@ -5,46 +5,44 @@
  */
 package Model;
 
-import View.DashboardView;
+//import View.DashboardView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- *
- * @author Stanley Sie
- */
+import java.io.File;
+import java.sql.SQLException;
+
 public class FacadeModel extends Model {
     private Account user;
     private ObservableList<Song> songs;
     private ObservableList<Playlist> groups;
     private Song currentSong;
-    private MusicPlayerDB database;
-    private AccountService accountService;
-    private PlaylistService playlistService;
-    private SongService songService;
+
+    private Service accountService;
+    private Service playlistService;
+    private Service songService;
     private AudioParser parser;
 
     public FacadeModel() {
         songs = FXCollections.observableArrayList();
         groups = FXCollections.observableArrayList();
-        database = new MusicPlayerDB();
-        accountService = new AccountService(database);
-        playlistService = new PlaylistService(database);
-        songService = new SongService(database);
+        accountService = new AccountService();
+        playlistService = new PlaylistService();
+        songService = new SongService();
         parser = new AudioParser();
     }
-    
+    /*
     public FacadeModel(DashboardView view) {
         super.attach(view);
     }
-
+*/
     public Song getCurrentSong() {
         return currentSong;
     }
 
     public void setCurrentSong(Song currentSong) {
         this.currentSong = currentSong;
-        super.update();
+        //super.update();
     }
     
     public Account getUser() {
@@ -53,7 +51,7 @@ public class FacadeModel extends Model {
 
     public void setUser(Account user) {
         this.user = user;
-        super.update();
+        //super.update();
     }
 
     public ObservableList<Song> getSongs() {
@@ -62,7 +60,7 @@ public class FacadeModel extends Model {
 
     public void setSongs(ObservableList<Song> songs) {
         this.songs = songs;
-        super.update();
+        //super.update();
     }
 
     public ObservableList<Playlist> getGroups() {
@@ -71,40 +69,119 @@ public class FacadeModel extends Model {
 
     public void setGroups(ObservableList<Playlist> groups) {
         this.groups = groups;
-        super.update();
-    } 
-    
+        //super.update();
+    }
+
     //METHOD CONNECTED TO DATABASE
-    public boolean login(String username, String password){
+    /*Pass the username and password of the login attempt
+    * Compares the username and password if it matches anthing in the database
+    * */
+    public boolean login(String username, String password) throws SQLException {
+        ObservableList<Object> accounts = null;
+        accounts = accountService.getAll();
+        if (accounts != null){
+            for (Object temp : accounts) {
+                if (((Account)temp).getUsername().compareTo(username) == 0 && ((Account)temp).getPassword().compareTo(password) == 0){
+                    user = (Account) temp;
+                    return true;
+                }
+            }
+        }
         return false;
     }
-    
-    public boolean addSong() {
+
+    public void logout(){
+        user = null;
+    }
+
+    /*Add/import one song to the database under the current user
+    * */
+    public boolean addSong(String filelocation) throws SQLException {
+        ObservableList<Object> songs = null;
+        songs = songService.getAll();
+        Song s = new Song();
+        File songFile = new File(filelocation);
+        s.setSongfile(songFile);
+        s = parser.getSongDetails(filelocation);
+        s.setUser(this.user.getUsername());
+
+        if (songs == null) {
+            s.setSongid("S01");
+            if(songService.add(s)){
+                return true;
+            }
+        } else {
+            s.setSongid(String.format("S%02d", songs.size() + 1));
+            if(songService.add(s)){
+                return true;
+            }
+        }
+
         return false;
     }
-    
-    public boolean deleteSong() {
-        return false;
+
+    /*Deletes one specific song in the database using songid
+    * Automatically deletes the song in the playlist that contains the song*/
+    public boolean deleteSong(String songid) throws SQLException {
+        return ((SongService)songService).delete(songid, user);
     }
     
     public boolean updateSong() {
         return false;
     }
-    
-    public boolean addPlaylist() {
+
+    /*Adds the playlist in the database*/
+    public boolean addPlaylist(Playlist p) throws SQLException {
+        ObservableList<Object> playlists = null;
+        playlists = playlistService.getAll();
+
+        if (playlists == null) {
+            p.setPlaylistid("P01");
+            if(((PlaylistService)playlistService).add(p, user)){
+                return true;
+            }
+        } else {
+            p.setPlaylistid(String.format("P%02d", playlists.size() + 1));
+            if(((PlaylistService)playlistService).add(p, user)){
+                return true;
+            }
+        }
+
         return false;
     }
-    
-    public boolean deletePlaylist() {
-        return false;
+
+    /*Deletes the playlist in the database*/
+    public boolean deletePlaylist(String playlistid) throws SQLException {
+        return playlistService.delete(playlistid);
     }
     
     public boolean updatePlaylist() {
         return false;
     }
-    
-    public boolean createUser() {
-        return false;
+
+    /*Register/sign-up a new user and saves it to the database
+    * Needs to pass account data type with*/
+    public boolean createUser(Account a) throws SQLException {
+        ObservableList<Object> accounts = null;
+        accounts = accountService.getAll();
+
+        if (accounts == null) {
+            if(accountService.add(a)){
+                user = a;
+                return true;
+            }
+
+        } else {
+            for (Object temp : accounts) {
+                if (((Account)temp).getUsername().compareTo(a.getUsername()) == 0)
+                    return false;
+            }
+            if(accountService.add(a)){
+                user = a;
+                return true;
+            }
+        }
+        return true;
     }
     
     //METHOD CONNECTED TO DATABASE
