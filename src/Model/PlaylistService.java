@@ -10,12 +10,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class PlaylistService {
+public class PlaylistService implements Service{
     private MusicPlayerDB db;
 
     public PlaylistService(MusicPlayerDB db) {
         this.db = db;
     }
+
+    public boolean add(Object o) throws SQLException{return false;}
 
     //adds playlist class and the account that owns the playlist. Songs in the playlist must already be imported to the database beforehand
     public boolean add(Playlist p, Account a) throws SQLException {
@@ -93,9 +95,9 @@ public class PlaylistService {
 
 
     //gets all the playlist in the parameter in an arraylist
-    public ArrayList<Playlist> getAll() throws SQLException {
+    public ObservableList<Object> getAll() throws SQLException {
         Connection connection = db.getConnection();
-        ArrayList <Playlist> playlists = new ArrayList<>();
+        ObservableList<Object> playlists = FXCollections.observableArrayList();
         ObservableList <Song> songs;
 
         String query ="SELECT * FROM playlist";
@@ -140,11 +142,11 @@ public class PlaylistService {
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
 
-                for(Playlist p : playlists){
-                    if(p.getPlaylistid().compareTo(playlistid) == 0) {
-                        songs = p.getSongs();
+                for(Object p : playlists){
+                    if(((Playlist)p).getPlaylistid().compareTo(playlistid) == 0) {
+                        songs = ((Playlist)p).getSongs();
                         songs.add(s);
-                        p.setSongs(FXCollections.observableArrayList());
+                        ((Playlist)p).setSongs(FXCollections.observableArrayList());
                     }
                 }
             }
@@ -227,9 +229,9 @@ public class PlaylistService {
     }
 
     //get playlist with the same name
-    public ArrayList<Playlist> getPlaylistName(String playlistname, String username) throws SQLException {
+    public ObservableList<Playlist> getPlaylistName(String playlistname, String username) throws SQLException {
         Connection connection = db.getConnection();
-        ArrayList <Playlist> playlists = new ArrayList<>();
+        ObservableList<Playlist> playlists = FXCollections.observableArrayList();
         ObservableList <Song> songs;
 
         String query ="SELECT * FROM playlist WHERE playlistname = '" + playlistname + "'";

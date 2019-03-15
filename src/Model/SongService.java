@@ -1,10 +1,11 @@
 package Model;
 
 import Mp3agic.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.*;
 import java.sql.*;
-import java.util.ArrayList;
 
 public class SongService {
     private MusicPlayerDB db;
@@ -57,9 +58,9 @@ public class SongService {
     }
 
     //gets all the songs in the parameter in an arraylist
-    public ArrayList<Song> getAll() throws SQLException {
+    public ObservableList<Song> getAll() throws SQLException {
         Connection connection = db.getConnection();
-        ArrayList <Song> songs = new ArrayList<>();
+        ObservableList <Song> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -109,9 +110,9 @@ public class SongService {
     }
 
     // gets song of a specific user
-    public ArrayList<Song> getUserSong(String username) throws SQLException {
+    public ObservableList<Song> getUserSong(String username) throws SQLException {
         Connection connection = db.getConnection();
-        ArrayList <Song> songs = new ArrayList<>();
+        ObservableList<Song> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song INNER JOIN usersong ON song.idsong = usersong.idsong " +
                 "WHERE username = '" + username + "'";
@@ -217,9 +218,9 @@ public class SongService {
     }
 
     //get songs with the same name
-    public ArrayList<Song> getSongName(String songname, String username) throws SQLException {
+    public ObservableList<Song> getSongName(String songname, String username) throws SQLException {
         Connection connection = db.getConnection();
-        ArrayList<Song> songs = new ArrayList<>();
+        ObservableList<Song> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song NATURAL JOIN usersong WHERE songname = '" + songname +
                 "' AND '" + username + "'";
@@ -277,7 +278,7 @@ public class SongService {
         Connection connection = db.getConnection();
         String query = "DELETE FROM song WHERE idsong = ?";
         PreparedStatement statement = connection.prepareStatement(query);
-        String query2 = "DELETE FROM usersong WHERE idsong = ?";
+        String query2 = "DELETE FROM usersong NATURAL JOIN songcollection WHERE idsong = ?";
         PreparedStatement statement2 = connection.prepareStatement(query2);
         try {
 
@@ -298,6 +299,7 @@ public class SongService {
     //pass the songid of the song that wants to be change and song class with COMPLETE information including the updates
     public boolean update(String songid, Song s, String username) throws SQLException {
         Connection connection = db.getConnection();
+        AudioParser ap = new AudioParser();
 
         String query = "UPDATE song SET "
                 + "songname = ?, "
@@ -334,59 +336,11 @@ public class SongService {
             statement2.setString(2, username);
 
             statement.executeUpdate();
-
-            //edits the metadata of the song file itself
-            Mp3File mp3file = new Mp3File(s.getFilelocation());
-            if (mp3file.hasId3v1Tag()) {
-                mp3file.removeId3v1Tag();
-            }
-            if (mp3file.hasId3v2Tag()) {
-                mp3file.removeId3v2Tag();
-            }
-            if (mp3file.hasCustomTag()) {
-                mp3file.removeCustomTag();
-            }
-            ID3v1 id3v1Tag;
-            ID3v1Genres ID3v1genres;
-            /*if (mp3file.hasId3v1Tag()) {
-                id3v1Tag =  mp3file.getId3v1Tag();
-            } else {*/
-                // mp3 does not have an ID3v1 tag, let's create one..
-            ID3v2 id3v2Tag;
-            id3v2Tag = new ID3v24Tag();
-            mp3file.setId3v2Tag(id3v2Tag);
-            //}
-
-            id3v2Tag.setTrack(s.getTrackNumber() + "");
-            id3v2Tag.setArtist(s.getArtist());
-            id3v2Tag.setTitle(s.getName());
-            id3v2Tag.setAlbum(s.getAlbum());
-            id3v2Tag.setYear(s.getYear() + "");
-            id3v2Tag.setGenre(ID3v1Genres.matchGenreDescription(s.getGenre()));
-            /*id3v2Tag.setComment("Some comment");
-            id3v2Tag.setLyrics("Some lyrics");
-            id3v2Tag.setComposer("The Composer");
-            id3v2Tag.setPublisher("A Publisher");
-            id3v2Tag.setOriginalArtist("Another Artist");*/
-            id3v2Tag.setAlbumArtist(s.getArtist());
-            /*id3v2Tag.setCopyright("Copyright");
-            id3v2Tag.setUrl("http://foobar");
-            id3v2Tag.setEncoder("The Encoder");*/
-            mp3file.save(s.getFilename());
-
             return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (NotSupportedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidDataException e) {
-            e.printStackTrace();
-        } catch (UnsupportedTagException e) {
             e.printStackTrace();
         } finally {
             if(statement != null) statement.close();

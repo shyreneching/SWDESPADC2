@@ -1,8 +1,11 @@
 package Model;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-public class AccountService {
+public class AccountService implements Service{
     private MusicPlayerDB db;
     private PlaylistService ps;
 
@@ -11,7 +14,8 @@ public class AccountService {
     }
 
     //adds account to the database. Must be COMPLETE information
-    public boolean add(Account a) throws SQLException {
+    public boolean add(Object o) throws SQLException {
+        Account a = (Account) o;
         String query = "INSERT INTO accounts VALUE (?, ?, ?)";
         Connection connection = db.getConnection();
         PreparedStatement statement = connection.prepareStatement(query);
@@ -36,9 +40,9 @@ public class AccountService {
     }
 
     //gets all the accounts in the parameter in an arraylist
-    public ArrayList<Account> getAll() throws SQLException {
+    public ObservableList<Object> getAll() throws SQLException {
         Connection connection = db.getConnection();
-        ArrayList <Account> accounts = new ArrayList<>();
+        ObservableList <Object> accounts = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM accounts";
         PreparedStatement statement = connection.prepareStatement(query);
