@@ -40,8 +40,8 @@ public class DashboardController implements Controller {
     
     public void setCurrentSong(Song song) {
         dashboardModel.setCurrentSong(song);
-        musicPlayerModel.setCurrentSong(song);
-        musicPlayerController.setCurrentSong(song);
+//        musicPlayerModel.setCurrentSong(song);
+//        musicPlayerController.setCurrentSong(song);
     }
     
     public Song getCurrentSong() {

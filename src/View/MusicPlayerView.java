@@ -70,18 +70,18 @@ public class MusicPlayerView extends View {
     }
 
     private void init() {
-        if (model.getCurrentSong() != null) {
-            songName.setText(model.getCurrentSong().getName());
-            artistName.setText(model.getCurrentSong().getArtist());
-            end.setText(model.getCurrentSong().getDuration());
-        }
+//        if (model.getCurrentSong() != null) {
+//            songName.setText(model.getCurrentSong().getName());
+//            artistName.setText(model.getCurrentSong().getArtist());
+//            end.setText(model.getCurrentSong().getDuration());
+//        }
     }
 
     @Override
     public void update() {
-        songName.setText(model.getCurrentSong().getName());
-        artistName.setText(model.getCurrentSong().getArtist());
-        end.setText(model.getCurrentSong().getDuration());
+//        songName.setText(model.getCurrentSong().getName());
+//        artistName.setText(model.getCurrentSong().getArtist());
+//        end.setText(model.getCurrentSong().getDuration());
     }
 
 }

@@ -17,19 +17,18 @@ public class FacadeModel extends Model {
     private ObservableList<Song> songs;
     private ObservableList<Playlist> groups;
     private Song currentSong;
-    private MusicPlayerDB database;
-    private AccountService accountService;
-    private PlaylistService playlistService;
-    private SongService songService;
+
+    private Service accountService;
+    private Service playlistService;
+    private Service songService;
     private AudioParser parser;
 
     public FacadeModel() {
         songs = FXCollections.observableArrayList();
         groups = FXCollections.observableArrayList();
-        database = new MusicPlayerDB();
-        accountService = new AccountService(database);
-        playlistService = new PlaylistService(database);
-        songService = new SongService(database);
+        accountService = new AccountService();
+        playlistService = new PlaylistService();
+        songService = new SongService();
         parser = new AudioParser();
     }
     /*
@@ -78,12 +77,12 @@ public class FacadeModel extends Model {
     * Compares the username and password if it matches anthing in the database
     * */
     public boolean login(String username, String password) throws SQLException {
-        ObservableList<Account> accounts = null;
+        ObservableList<Object> accounts = null;
         accounts = accountService.getAll();
         if (accounts != null){
-            for (Account temp : accounts) {
-                if (temp.getUsername().compareTo(username) == 0 && temp.getPassword().compareTo(password) == 0){
-                    user = temp;
+            for (Object temp : accounts) {
+                if (((Account)temp).getUsername().compareTo(username) == 0 && ((Account)temp).getPassword().compareTo(password) == 0){
+                    user = (Account) temp;
                     return true;
                 }
             }
@@ -98,7 +97,7 @@ public class FacadeModel extends Model {
     /*Add/import one song to the database under the current user
     * */
     public boolean addSong(String filelocation) throws SQLException {
-        ObservableList<Song> songs = null;
+        ObservableList<Object> songs = null;
         songs = songService.getAll();
         Song s = new Song();
         File songFile = new File(filelocation);
@@ -124,7 +123,7 @@ public class FacadeModel extends Model {
     /*Deletes one specific song in the database using songid
     * Automatically deletes the song in the playlist that contains the song*/
     public boolean deleteSong(String songid) throws SQLException {
-        return songService.delete(songid);
+        return ((SongService)songService).delete(songid, user);
     }
     
     public boolean updateSong() {
@@ -133,17 +132,17 @@ public class FacadeModel extends Model {
 
     /*Adds the playlist in the database*/
     public boolean addPlaylist(Playlist p) throws SQLException {
-        ObservableList<Playlist> playlists = null;
+        ObservableList<Object> playlists = null;
         playlists = playlistService.getAll();
 
         if (playlists == null) {
             p.setPlaylistid("P01");
-            if(playlistService.add(p, user)){
+            if(((PlaylistService)playlistService).add(p, user)){
                 return true;
             }
         } else {
             p.setPlaylistid(String.format("P%02d", playlists.size() + 1));
-            if(playlistService.add(p, user)){
+            if(((PlaylistService)playlistService).add(p, user)){
                 return true;
             }
         }
@@ -163,7 +162,7 @@ public class FacadeModel extends Model {
     /*Register/sign-up a new user and saves it to the database
     * Needs to pass account data type with*/
     public boolean createUser(Account a) throws SQLException {
-        ObservableList<Account> accounts = null;
+        ObservableList<Object> accounts = null;
         accounts = accountService.getAll();
 
         if (accounts == null) {
@@ -173,8 +172,8 @@ public class FacadeModel extends Model {
             }
 
         } else {
-            for (Account temp : accounts) {
-                if (temp.getUsername().compareTo(a.getUsername()) == 0)
+            for (Object temp : accounts) {
+                if (((Account)temp).getUsername().compareTo(a.getUsername()) == 0)
                     return false;
             }
             if(accountService.add(a)){

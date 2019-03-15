@@ -22,16 +22,16 @@ public class MusicPlayerController implements Controller {
     public MusicPlayerController(MusicPlayer model) {
         this.model = model;
         view = new MusicPlayerView(this, this.model);
-        this.model.attach(view);
+//        this.model.attach(view);
     }
-    
-    public void setCurrentSong(Song song) {
-        model.setCurrentSong(song);
-    }
+
+//    public void setCurrentSong(Song song) {
+//        model.setCurrentSong(song);
+//    }
     
     @Override
     public void setModel(Model model) {
-        this.model = (MusicPlayer) model;
+//        this.model = (MusicPlayer) model;
     }
     
 }

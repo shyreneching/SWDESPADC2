@@ -6,20 +6,21 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 public class AccountService implements Service{
-    private MusicPlayerDB db;
+    private JDBCConnectionPool pool;
     private PlaylistService ps;
 
-    public AccountService(MusicPlayerDB db) {
-        this.db = db;
+    public AccountService() {
+         pool = new JDBCConnectionPool();
     }
 
     //adds account to the database. Must be COMPLETE information
     public boolean add(Object o) throws SQLException {
         Account a = (Account) o;
-        String query = "INSERT INTO accounts VALUE (?, ?, ?)";
-        Connection connection = db.getConnection();
-        PreparedStatement statement = connection.prepareStatement(query);
 
+        // Get a connection:
+        Connection connection = pool.checkOut();
+        String query = "INSERT INTO accounts VALUE (?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(query);
         try {
             statement.setString(1, a.getUsername());
             statement.setString(2, a.getPassword());
@@ -34,16 +35,17 @@ public class AccountService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
-
-
+        // Return the connection
+        pool.checkIn(connection);
         return false;
     }
 
     //gets all the accounts in the parameter in an arraylist
     public ObservableList<Object> getAll() throws SQLException {
-        Connection connection = db.getConnection();
-        ObservableList <Object> accounts = FXCollections.observableArrayList();
+        // Get a connection:
+        Connection connection = pool.checkOut();
 
+        ObservableList <Object> accounts = FXCollections.observableArrayList();
         String query ="SELECT * FROM accounts";
         PreparedStatement statement = connection.prepareStatement(query);
         try {
@@ -63,12 +65,14 @@ public class AccountService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     //gets one specific account with the username as a parameter
     public Account getAccount(String username) throws SQLException {
-        Connection connection = db.getConnection();
+        // Get a connection:
+        Connection connection = pool.checkOut();
 
         String query ="SELECT * FROM accounts WHERE username = " + username;
         PreparedStatement statement = connection.prepareStatement(query);
@@ -89,12 +93,14 @@ public class AccountService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     //pass the username of the account that you want to view the playlist
     public List<Playlist> getUserPlaylist(String username) throws SQLException {
-        Connection connection = db.getConnection();
+        // Get a connection:
+        Connection connection = pool.checkOut();
         List <Playlist> playlist = new ArrayList<>();
 
         String query ="SELECT * FROM playlist WHERE username = '" + username + "'";
@@ -112,13 +118,15 @@ public class AccountService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return playlist;
     }
 
     //pass the username to delete an account
     public boolean delete(String username) throws SQLException {
+        // Get a connection:
+        Connection connection = pool.checkOut();
         String query = "DELETE FROM accounts WHERE username = ?";
-        Connection connection = db.getConnection();
         PreparedStatement statement = connection.prepareStatement(query);
         try {
 
@@ -132,14 +140,17 @@ public class AccountService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 
     //pass the username of the account that wants to be change and an account class with COMPLETE information including the updates
-    public boolean update(String username, Account a) throws SQLException {
+    public boolean update(String username, Object o) throws SQLException {
         //UPDATE
-        Connection connection = db.getConnection();
+        // Get a connection:
+        Connection connection = pool.checkOut();
 
+        Account a = (Account) o;
         String query = "UPDATE accounts SET "
                 + "name = ?, "
                 + "password = ?, "
@@ -160,6 +171,7 @@ public class AccountService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 

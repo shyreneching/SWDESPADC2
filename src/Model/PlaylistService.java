@@ -8,20 +8,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class PlaylistService implements Service{
-    private MusicPlayerDB db;
+    private JDBCConnectionPool pool;
 
-    public PlaylistService(MusicPlayerDB db) {
-        this.db = db;
+    public PlaylistService() {
+        pool = new JDBCConnectionPool();
     }
 
     public boolean add(Object o) throws SQLException{return false;}
 
     //adds playlist class and the account that owns the playlist. Songs in the playlist must already be imported to the database beforehand
     public boolean add(Playlist p, Account a) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         String query = "INSERT INTO playlist VALUE (?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
         String query2 = "INSERT INTO songcollection VALUE (?, ?)";
@@ -47,12 +46,13 @@ public class PlaylistService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 
     //adds an arraylist of songs to the playlist
     public boolean addSongsPlaylist(ObservableList<Song> songs, String playlistid) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         Boolean added = false;
         String query2 = "INSERT INTO songcollection VALUE (?, ?)";
         PreparedStatement statement2 = connection.prepareStatement(query2);
@@ -71,11 +71,12 @@ public class PlaylistService implements Service{
             if(statement2 != null) statement2.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 
     public boolean addSongPlaylist(Song s, String playlistid) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         String query = "INSERT INTO songcollection VALUE (?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
         try {
@@ -90,13 +91,14 @@ public class PlaylistService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 
 
     //gets all the playlist in the parameter in an arraylist
     public ObservableList<Object> getAll() throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         ObservableList<Object> playlists = FXCollections.observableArrayList();
         ObservableList <Song> songs;
 
@@ -159,12 +161,13 @@ public class PlaylistService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     //gets one specific playlist with the playlistid
     public Playlist getPlaylist(String playlistid, String username) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         ObservableList<Song> songs;
         Playlist p = new Playlist();
 
@@ -225,12 +228,13 @@ public class PlaylistService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     //get playlist with the same name
     public ObservableList<Playlist> getPlaylistName(String playlistname, String username) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         ObservableList<Playlist> playlists = FXCollections.observableArrayList();
         ObservableList <Song> songs;
 
@@ -300,12 +304,13 @@ public class PlaylistService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     //pass the playlist id to delete the specific song
     public boolean delete(String playlistid) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         String query = "DELETE FROM playlist WHERE idplaylist = ?";
         PreparedStatement statement = connection.prepareStatement(query);
         String query2 = "DELETE FROM songcollection WHERE idplaylist = ?";
@@ -327,7 +332,7 @@ public class PlaylistService implements Service{
 
     //deletes all the songs in the playlist, pass the playlistid as parameter
     public boolean deleteAllSongsInPlaylist(String playlistid) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         String query2 = "DELETE FROM songcollection WHERE idplaylist = ?";
         PreparedStatement statement2 = connection.prepareStatement(query2);
         try {
@@ -340,13 +345,15 @@ public class PlaylistService implements Service{
             if(statement2 != null) statement2.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 
     //pass the playlistid of the playlist that wants to be change and playlist class with COMPLETE information including the updates
-    public boolean update(String playlistid, Playlist p) throws SQLException {
-        Connection connection = db.getConnection();
+    public boolean update(String playlistid, Object o) throws SQLException {
+        Connection connection = pool.checkOut();
 
+        Playlist p = (Playlist) o;
         String query = "UPDATE playlist, SET "
                 + "playlistname = ?,"
                 + " WHERE playlist= ?";
@@ -365,6 +372,7 @@ public class PlaylistService implements Service{
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 

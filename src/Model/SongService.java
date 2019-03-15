@@ -7,16 +7,17 @@ import javafx.collections.ObservableList;
 import java.io.*;
 import java.sql.*;
 
-public class SongService {
-    private MusicPlayerDB db;
+public class SongService implements Service{
+    private JDBCConnectionPool pool;
 
-    public SongService(MusicPlayerDB db) {
-        this.db = db;
+    public SongService() {
+        pool = new JDBCConnectionPool();
     }
 
     //adds song to the database. Must be COMPLETE information
-    public boolean add(Song s) throws SQLException {
-        Connection connection = db.getConnection();
+    public boolean add(Object o) throws SQLException {
+        Song s = (Song) o;
+        Connection connection = pool.checkOut();
         String query = "INSERT INTO song VALUE (?, ?, ?, ?, ? ,?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
         String query2 = "INSERT INTO usersong VALUE (?, ?, ?)";
@@ -52,15 +53,14 @@ public class SongService {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
-
-
+        pool.checkIn(connection);
         return false;
     }
 
     //gets all the songs in the parameter in an arraylist
-    public ObservableList<Song> getAll() throws SQLException {
-        Connection connection = db.getConnection();
-        ObservableList <Song> songs = FXCollections.observableArrayList();
+    public ObservableList<Object> getAll() throws SQLException {
+        Connection connection = pool.checkOut();
+        ObservableList <Object> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -106,12 +106,13 @@ public class SongService {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     // gets song of a specific user
     public ObservableList<Song> getUserSong(String username) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         ObservableList<Song> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song INNER JOIN usersong ON song.idsong = usersong.idsong " +
@@ -160,12 +161,13 @@ public class SongService {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     //gets one specific song with the id of the song
     public Song getSong(String songid, String username) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
 
         String query ="SELECT * FROM song NATURAL JOIN usersong WHERE idsong = '" + songid +
                 "' AND username = '" + username + "'";
@@ -214,12 +216,13 @@ public class SongService {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
     //get songs with the same name
     public ObservableList<Song> getSongName(String songname, String username) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         ObservableList<Song> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song NATURAL JOIN usersong WHERE songname = '" + songname +
@@ -270,21 +273,29 @@ public class SongService {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return null;
     }
 
+    public boolean delete(String s){return false;}
+
     //pass the song id to delete the specific song
-    public boolean delete(String songid) throws SQLException {
-        Connection connection = db.getConnection();
-        String query = "DELETE FROM song WHERE idsong = ?";
+    public boolean delete(String songid, Account a) throws SQLException {
+        Connection connection = pool.checkOut();
+        String query = "DELETE FROM usersong " +
+                "WHERE idsong = ? AND username = ?";
+        String query2 = "DELETE FROM songcollection " +
+                "WHERE idsong = ? AND playlistid = ?";
         PreparedStatement statement = connection.prepareStatement(query);
-        String query2 = "DELETE FROM usersong NATURAL JOIN songcollection WHERE idsong = ?";
         PreparedStatement statement2 = connection.prepareStatement(query2);
         try {
-
             statement.setString(1, songid);
-            statement2.setString(1, songid);
-            statement2.execute();
+            statement.setString(2, a.getUsername());
+            for (Playlist p: a.getPlaylists()) {
+                statement2.setString(1, songid);
+                statement2.setString(2, p.getPlaylistid());
+                statement2.execute();
+            }
             boolean deleted  = statement.execute();
             return deleted;
         } catch (SQLException e){
@@ -296,9 +307,10 @@ public class SongService {
         return false;
     }
 
+    public boolean update(String s, Object o){return false;}
     //pass the songid of the song that wants to be change and song class with COMPLETE information including the updates
     public boolean update(String songid, Song s, String username) throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = pool.checkOut();
         AudioParser ap = new AudioParser();
 
         String query = "UPDATE song SET "
@@ -346,6 +358,7 @@ public class SongService {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
         }
+        pool.checkIn(connection);
         return false;
     }
 }

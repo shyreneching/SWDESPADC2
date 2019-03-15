@@ -1,3 +1,5 @@
+SET GLOBAL max_allowed_packet=1073741824;
+
 CREATE DATABASE IF NOT EXISTS MusicPlayer /*!40100 DEFAULT CHARACTER SET utf8*/;
 USE MusicPlayer;
 
@@ -75,10 +77,10 @@ DROP TABLE IF EXISTS `song`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `song` (
   `idsong` varchar(15) NOT NULL,
-  `songname` varchar(45) DEFAULT NULL,
-  `genre` varchar(45) DEFAULT NULL,
-  `artist` varchar(45) DEFAULT NULL,
-  `album` varchar(45) DEFAULT NULL,
+  `songname` varchar(100) DEFAULT NULL,
+  `genre` varchar(100) DEFAULT NULL,
+  `artist` varchar(100) DEFAULT NULL,
+  `album` varchar(100) DEFAULT NULL,
   `year` int(11) DEFAULT NULL,
   `trackNumber` int(11) DEFAULT NULL,
   `length` int(11) DEFAULT NULL,
@@ -92,7 +94,10 @@ CREATE TABLE `song` (
 -- Dumping data for table `song`
 --
 
-
+LOCK TABLES `song` WRITE;
+/*!40000 ALTER TABLE `song` DISABLE KEYS */;
+/*!40000 ALTER TABLE `song` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `songcollection`
@@ -138,6 +143,7 @@ CREATE TABLE `usersong` (
 
 LOCK TABLES `usersong` WRITE;
 /*!40000 ALTER TABLE `usersong` DISABLE KEYS */;
+INSERT INTO `usersong` VALUES ('S02','Le User',0);
 /*!40000 ALTER TABLE `usersong` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -150,4 +156,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-06 15:29:41
+-- Dump completed on 2019-03-13 15:44:43
