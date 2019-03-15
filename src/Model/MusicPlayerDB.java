@@ -13,7 +13,7 @@ public class MusicPlayerDB {
     public final static String DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
     public final static String URL = "jdbc:mysql://localhost:3306/";
     public final static String USERNAME = "root";
-    public final static String PASSWORD = "p@ssword";
+    public final static String PASSWORD = "kitagawamizuki";
     public final static String DATABASE = "MusicPlayer";
 
     public Connection getConnection(){
