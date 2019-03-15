@@ -1,8 +1,3 @@
-SET GLOBAL max_allowed_packet=1073741824;
-
-CREATE DATABASE IF NOT EXISTS MusicPlayer /*!40100 DEFAULT CHARACTER SET utf8*/;
-USE MusicPlayer;
-
 -- MySQL dump 10.13  Distrib 8.0.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: musicplayer
@@ -86,6 +81,7 @@ CREATE TABLE `song` (
   `length` int(11) DEFAULT NULL,
   `size` float DEFAULT NULL,
   `songfile` longblob NOT NULL,
+  `dateuploaded` datetime DEFAULT NULL,
   PRIMARY KEY (`idsong`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -156,4 +152,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-13 15:44:43
+-- Dump completed on 2019-03-15 23:51:15
