@@ -11,7 +11,7 @@ public class AlbumPlaylistConcreteFactory extends PlaylistFactory {
         super.playlistList = new UserPlaylist();
     }
 
-    public ObservableList<Playlist> playlistFactoryMethod(String username) throws SQLException {
+    public ObservableList<PlaylistInterface> playlistFactoryMethod(String username) throws SQLException {
         return playlistList.createPlaylist(username);
     }
 }

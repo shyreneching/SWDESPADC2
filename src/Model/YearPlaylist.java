@@ -12,23 +12,23 @@ public class YearPlaylist implements PlaylistList {
         this.songService = new SongService();
     }
 
-    public ObservableList<Playlist> createPlaylist(String username) throws SQLException {
-        ObservableList<Song> songs = songService.getUserSong(username);
-        ObservableList<Playlist> playlists = FXCollections.observableArrayList();
+    public ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
+        ObservableList<SongInterface> songs = songService.getUserSong(username);
+        ObservableList<PlaylistInterface> playlists = FXCollections.observableArrayList();
         boolean added = false;
 
-        for(Song s: songs){
-            for(Playlist play: playlists){
+        for(SongInterface s: songs){
+            for(PlaylistInterface play: playlists){
                 if(play.getName().equals(s.getYear())){
-                    ObservableList<Song> temp = play.getSongs();
+                    ObservableList<SongInterface> temp = play.getSongs();
                     temp.add(s);
                     play.setSongs(temp);
                     added = true;
                 }
             }
             if(!added){
-                ObservableList<Song> temp = FXCollections.observableArrayList();
-                Playlist p = new Playlist();
+                ObservableList<SongInterface> temp = FXCollections.observableArrayList();
+                PlaylistInterface p = new Playlist();
                 p.setName(s.getYear() + "");
                 temp.add(s);
                 p.setSongs(temp);

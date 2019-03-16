@@ -123,7 +123,7 @@ public class SongService implements Service{
                 s.setSongfile(theFile);
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
-                s.setDate(rs.getTimestamp("dateupdated"));
+                s.setDate(rs.getTimestamp("dateuploaded"));
 
                 songs.add(s);
             }
@@ -179,7 +179,7 @@ public class SongService implements Service{
                 s.setFilelocation(theFile.getAbsolutePath());
                 s.setUser(rs.getString("username"));
                 s.setTimesplayed(rs.getInt("timesplayed"));
-                s.setDate(rs.getTimestamp("dateupdated"));
+                s.setDate(rs.getTimestamp("dateuploaded"));
                 songs.add(s);
             }
             return songs;
@@ -233,7 +233,7 @@ public class SongService implements Service{
                 s.setFilelocation(theFile.getAbsolutePath());
                 s.setUser(rs.getString("username"));
                 s.setTimesplayed(rs.getInt("timesplayed"));
-                s.setDate(rs.getTimestamp("dateupdated"));
+                s.setDate(rs.getTimestamp("dateuploaded"));
                 return s;
             }
 
@@ -290,7 +290,7 @@ public class SongService implements Service{
                 s.setFilelocation(theFile.getAbsolutePath());
                 s.setUser(rs.getString("username"));
                 s.setTimesplayed(rs.getInt("timesplayed"));
-                s.setDate(rs.getTimestamp("dateupdated"));
+                s.setDate(rs.getTimestamp("dateuploaded"));
                 songs.add(s);
             }
             return songs;

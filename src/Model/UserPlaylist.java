@@ -10,8 +10,8 @@ public class UserPlaylist implements PlaylistList {
         this.playlistService = new PlaylistService();
     }
 
-    public ObservableList<Playlist> createPlaylist(String username) throws SQLException {
-        ObservableList<Playlist> playlists = playlistService.getUserPlaylist(username);
+    public ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
+        ObservableList<PlaylistInterface> playlists = playlistService.getUserPlaylist(username);
         return playlists;
     }
 
