@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 
 public interface SongInterface {
 
+
     public String getSongid();
 
     public void setSongid(String songid);
@@ -44,6 +45,7 @@ public interface SongInterface {
     public double getSize();
 
     public void setSize(double size);
+
 
     public Timestamp getDate();
 

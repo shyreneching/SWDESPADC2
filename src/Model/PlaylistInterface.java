@@ -3,6 +3,7 @@ package Model;
 import javafx.collections.ObservableList;
 
 public interface PlaylistInterface {
+
     public String getPlaylistid();
 
     public void setPlaylistid(String playlistid);

@@ -98,10 +98,10 @@ public class AccountService implements Service{
     }
 
     //pass the username of the account that you want to view the playlist
-    public List<Playlist> getUserPlaylist(String username) throws SQLException {
+    public ObservableList<PlaylistInterface> getUserPlaylist(String username) throws SQLException {
         // Get a connection:
         Connection connection = pool.checkOut();
-        List <Playlist> playlist = new ArrayList<>();
+        ObservableList<PlaylistInterface> playlist = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM playlist WHERE username = '" + username + "'";
         PreparedStatement statement = connection.prepareStatement(query);

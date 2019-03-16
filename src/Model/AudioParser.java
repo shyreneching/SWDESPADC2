@@ -19,7 +19,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.imageio.ImageIO;
 
-public class AudioParser implements AudioParserInterface {
+public class AudioParser implements AudioParserInterface{
 
     /*Sets
     * song name
@@ -177,5 +177,5 @@ public class AudioParser implements AudioParserInterface {
         file.delete();
         return s;
     }
-    
+
 }

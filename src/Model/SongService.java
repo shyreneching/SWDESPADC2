@@ -61,6 +61,31 @@ public class SongService implements Service{
         return false;
     }
 
+    //adds existing song to user
+    public boolean addSongtoUser(String songid, String username) throws SQLException {
+        Connection connection = pool.checkOut();
+
+        String query = "INSERT INTO usersong VALUE (?, ?, ?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+
+        try {
+            statement.setString(1, songid);
+            statement.setString(2, username);
+            statement.setInt(3, 0);
+
+            boolean added = statement.execute();
+
+            return added;
+        } catch (SQLException e){
+            e.printStackTrace();
+        } finally {
+            if(statement != null) statement.close();
+            if(connection != null)  connection.close();
+        }
+        pool.checkIn(connection);
+        return false;
+    }
+
     //gets all the songs in the parameter in an arraylist
     public ObservableList<Object> getAll() throws SQLException {
         Connection connection = pool.checkOut();
@@ -180,7 +205,7 @@ public class SongService implements Service{
         try {
             ResultSet rs = statement.executeQuery();
             if(rs.next()) {
-                SongInterface s = new Song();
+                Song s = new Song();
                 s.setSongid(rs.getString("idsong"));
                 s.setName(rs.getString("songname"));
                 s.setGenre(rs.getString("genre"));
@@ -297,7 +322,7 @@ public class SongService implements Service{
         try {
             statement.setString(1, songid);
             statement.setString(2, a.getUsername());
-            for (Playlist p: a.getPlaylists()) {
+            for (PlaylistInterface p: a.getPlaylists()) {
                 statement2.setString(1, songid);
                 statement2.setString(2, p.getPlaylistid());
                 statement2.execute();
@@ -318,7 +343,7 @@ public class SongService implements Service{
     //pass the songid of the song that wants to be change and song class with COMPLETE information including the updates
     public boolean update(String songid, SongInterface s, String username) throws SQLException {
         Connection connection = pool.checkOut();
-        AudioParser ap = new AudioParser();
+        AudioParserInterface ap = new AudioParser();
 
         String query = "UPDATE song SET "
                 + "songname = ?, "

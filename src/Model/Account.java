@@ -6,7 +6,7 @@ import javafx.collections.ObservableList;
 public class Account {
     
     private String username, password, name;
-    private ObservableList<Playlist> playlists;
+    private ObservableList<PlaylistInterface> playlists;
     private ObservableList<SongInterface> songs;
 
     public Account(){
@@ -45,11 +45,11 @@ public class Account {
         this.name = name;
     }
 
-    public ObservableList<Playlist> getPlaylists() {
+    public ObservableList<PlaylistInterface> getPlaylists() {
         return playlists;
     }
 
-    public void setPlaylists(ObservableList<Playlist> playlists) {
+    public void setPlaylists(ObservableList<PlaylistInterface> playlists) {
         this.playlists = playlists;
     }
 

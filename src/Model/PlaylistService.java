@@ -19,7 +19,7 @@ public class PlaylistService implements Service{
     public boolean add(Object o) throws SQLException{return false;}
 
     //adds playlist class and the account that owns the playlist. Songs in the playlist must already be imported to the database beforehand
-    public boolean add(Playlist p, Account a) throws SQLException {
+    public boolean add(PlaylistInterface p, Account a) throws SQLException {
         Connection connection = pool.checkOut();
         String query = "INSERT INTO playlist VALUE (?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -109,7 +109,7 @@ public class PlaylistService implements Service{
         try {
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                Playlist p = new Playlist();
+                PlaylistInterface p = new Playlist();
                 p.setPlaylistid(rs.getString("idplaylist"));
                 p.setName(rs.getString("playlistname"));
                 p.setSongs(FXCollections.observableArrayList());
@@ -166,9 +166,9 @@ public class PlaylistService implements Service{
         return null;
     }
 
-    public ObservableList<Playlist> getUserPlaylist(String username) throws SQLException {
+    public ObservableList<PlaylistInterface> getUserPlaylist(String username) throws SQLException {
         Connection connection = pool.checkOut();
-        ObservableList<Playlist> playlists = FXCollections.observableArrayList();
+        ObservableList<PlaylistInterface> playlists = FXCollections.observableArrayList();
         ObservableList <SongInterface> songs;
 
         String query ="SELECT * FROM playlist WHERE username = " + username;
@@ -178,7 +178,7 @@ public class PlaylistService implements Service{
         try {
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                Playlist p = new Playlist();
+                PlaylistInterface p = new Playlist();
                 p.setPlaylistid(rs.getString("idplaylist"));
                 p.setName(rs.getString("playlistname"));
                 p.setSongs(FXCollections.observableArrayList());
@@ -213,7 +213,7 @@ public class PlaylistService implements Service{
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
 
-                for(Playlist p : playlists){
+                for(PlaylistInterface p : playlists){
                     if(p.getPlaylistid().compareTo(playlistid) == 0) {
                         songs = p.getSongs();
                         songs.add(s);
@@ -236,10 +236,10 @@ public class PlaylistService implements Service{
     }
 
     //gets one specific playlist with the playlistid
-    public Playlist getPlaylist(String playlistid, String username) throws SQLException {
+    public PlaylistInterface getPlaylist(String playlistid, String username) throws SQLException {
         Connection connection = pool.checkOut();
         ObservableList<SongInterface> songs;
-        Playlist p = new Playlist();
+        PlaylistInterface p = new Playlist();
 
         String query ="SELECT * FROM playlist WHERE idplaylist = '" + playlistid + "'";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -303,9 +303,9 @@ public class PlaylistService implements Service{
     }
 
     //get playlist with the same name
-    public ObservableList<Playlist> getPlaylistName(String playlistname, String username) throws SQLException {
+    public ObservableList<PlaylistInterface> getPlaylistName(String playlistname, String username) throws SQLException {
         Connection connection = pool.checkOut();
-        ObservableList<Playlist> playlists = FXCollections.observableArrayList();
+        ObservableList<PlaylistInterface> playlists = FXCollections.observableArrayList();
         ObservableList <SongInterface> songs;
 
         String query ="SELECT * FROM playlist WHERE playlistname = '" + playlistname + "'";
@@ -318,7 +318,7 @@ public class PlaylistService implements Service{
         try {
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                Playlist p = new Playlist();
+                PlaylistInterface p = new Playlist();
                 p.setPlaylistid(rs.getString("idplaylist"));
                 p.setName(rs.getString("playlistname"));
                 p.setSongs(FXCollections.observableArrayList());
@@ -355,7 +355,7 @@ public class PlaylistService implements Service{
                 s.setTimesplayed(rs2.getInt("timesplayed"));
                 s.setUser(rs2.getString("username"));
 
-                for(Playlist p : playlists){
+                for(PlaylistInterface p : playlists){
                     if(p.getPlaylistid().compareTo(playlistid) == 0) {
                         songs = p.getSongs();
                         songs.add(s);
@@ -401,6 +401,27 @@ public class PlaylistService implements Service{
     }
 
     //deletes all the songs in the playlist, pass the playlistid as parameter
+    public boolean deleteSongInPlaylist(String songid, String playlistid) throws SQLException {
+        Connection connection = pool.checkOut();
+        String query2 = "DELETE FROM songcollection WHERE idplaylist = ? AND idsong = ?";
+        PreparedStatement statement2 = connection.prepareStatement(query2);
+        try {
+            statement2.setString(1, playlistid);
+            statement2.setString(2, songid);
+            boolean deleted  = statement2.execute();
+            return deleted;
+        } catch (SQLException e){
+            e.printStackTrace();
+        } finally {
+            if(statement2 != null) statement2.close();
+            if(connection != null)  connection.close();
+        }
+        pool.checkIn(connection);
+        return false;
+    }
+
+
+    //deletes all the songs in the playlist, pass the playlistid as parameter
     public boolean deleteAllSongsInPlaylist(String playlistid) throws SQLException {
         Connection connection = pool.checkOut();
         String query2 = "DELETE FROM songcollection WHERE idplaylist = ?";
@@ -423,7 +444,7 @@ public class PlaylistService implements Service{
     public boolean update(String playlistid, Object o) throws SQLException {
         Connection connection = pool.checkOut();
 
-        Playlist p = (Playlist) o;
+        PlaylistInterface p = (Playlist) o;
         String query = "UPDATE playlist, SET "
                 + "playlistname = ?,"
                 + " WHERE playlist= ?";
@@ -446,7 +467,7 @@ public class PlaylistService implements Service{
         return false;
     }
 
-    public boolean updatePlaylistSongs(String playlistid, Playlist p) throws SQLException {
+    public boolean updatePlaylistSongs(String playlistid, PlaylistInterface p) throws SQLException {
         deleteAllSongsInPlaylist(playlistid);
         addSongsPlaylist(p.getSongs(), playlistid);
         return false;

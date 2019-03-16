@@ -2,7 +2,7 @@ package Model;
 
 import javafx.collections.ObservableList;
 
-public class Playlist implements PlaylistInterface {
+public class Playlist implements PlaylistInterface{
     
     private String playlistid, name;
     private ObservableList<SongInterface> songs;
