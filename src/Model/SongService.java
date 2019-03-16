@@ -19,7 +19,7 @@ public class SongService implements Service{
 
     //adds song to the database. Must be COMPLETE information
     public boolean add(Object o) throws SQLException {
-        Song s = (Song) o;
+        SongInterface s = (Song) o;
         Connection connection = pool.checkOut();
         String query = "INSERT INTO song VALUE (?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -73,7 +73,7 @@ public class SongService implements Service{
 
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                Song s = new Song();
+                SongInterface s = new Song();
                 s.setSongid(rs.getString("idsong"));
                 s.setName(rs.getString("songname"));
                 s.setGenre(rs.getString("genre"));
@@ -116,9 +116,9 @@ public class SongService implements Service{
     }
 
     // gets song of a specific user
-    public ObservableList<Song> getUserSong(String username) throws SQLException {
+    public ObservableList<SongInterface> getUserSong(String username) throws SQLException {
         Connection connection = pool.checkOut();
-        ObservableList<Song> songs = FXCollections.observableArrayList();
+        ObservableList<SongInterface> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song INNER JOIN usersong ON song.idsong = usersong.idsong " +
                 "WHERE username = '" + username + "'";
@@ -127,7 +127,7 @@ public class SongService implements Service{
 
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                Song s = new Song();
+                SongInterface s = new Song();
                 s.setSongid(rs.getString("idsong"));
                 s.setName(rs.getString("songname"));
                 s.setGenre(rs.getString("genre"));
@@ -171,7 +171,7 @@ public class SongService implements Service{
     }
 
     //gets one specific song with the id of the song
-    public Song getSong(String songid, String username) throws SQLException {
+    public SongInterface getSong(String songid, String username) throws SQLException {
         Connection connection = pool.checkOut();
 
         String query ="SELECT * FROM song NATURAL JOIN usersong WHERE idsong = '" + songid +
@@ -227,9 +227,9 @@ public class SongService implements Service{
     }
 
     //get songs with the same name
-    public ObservableList<Song> getSongName(String songname, String username) throws SQLException {
+    public ObservableList<SongInterface> getSongName(String songname, String username) throws SQLException {
         Connection connection = pool.checkOut();
-        ObservableList<Song> songs = FXCollections.observableArrayList();
+        ObservableList<SongInterface> songs = FXCollections.observableArrayList();
 
         String query ="SELECT * FROM song NATURAL JOIN usersong WHERE songname = '" + songname +
                 "' AND '" + username + "'";
@@ -238,7 +238,7 @@ public class SongService implements Service{
 
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                Song s = new Song();
+                SongInterface s = new Song();
                 s.setSongid(rs.getString("idsong"));
                 s.setName(rs.getString("songname"));
                 s.setGenre(rs.getString("genre"));
@@ -314,8 +314,9 @@ public class SongService implements Service{
     }
 
     public boolean update(String s, Object o){return false;}
+
     //pass the songid of the song that wants to be change and song class with COMPLETE information including the updates
-    public boolean update(String songid, Song s, String username) throws SQLException {
+    public boolean update(String songid, SongInterface s, String username) throws SQLException {
         Connection connection = pool.checkOut();
         AudioParser ap = new AudioParser();
 

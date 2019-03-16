@@ -32,7 +32,7 @@ public class AudioParser {
     * song location
     * song filename
     * */
-    public Song getSongDetails(String location){
+    public SongInterface getSongDetails(String location){
         String fileLocation = location;
         Song s = new Song();
 
@@ -67,7 +67,7 @@ public class AudioParser {
             d =  d/1000;
             s.setLength(d.intValue());
             s.setFilelocation(location);
-            s.setFilename(s.getArtist() + "-" + s.getName()+ ".mp3");
+            s.setFilename("src/Music/" + s.getArtist() + "-" + s.getName()+ ".mp3");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -84,7 +84,7 @@ public class AudioParser {
     // Returns the album art of the song in File Format
     // Need to pass song with album art
     // Returns null if no album art
-    public File getSongImage(Song s) throws InvalidDataException, IOException, UnsupportedTagException {
+    public File getSongImage(SongInterface s) throws InvalidDataException, IOException, UnsupportedTagException {
         Mp3File music = new Mp3File(s.getFilelocation());
         File outputfile = new File(s.getArtist() + "_" + s.getAlbum() + ".jpg");
         if (music.hasId3v2Tag()){
@@ -103,7 +103,7 @@ public class AudioParser {
          return null;
     }
 
-    public Song setSongImage(Song s, File image) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
+    public SongInterface setSongImage(SongInterface s, File image) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
         Mp3File mp3file = new Mp3File(s.getFilelocation());
         ID3v2 id3v2Tag;
         id3v2Tag = new ID3v24Tag();
@@ -125,23 +125,23 @@ public class AudioParser {
         //temporarily sets the file name to "temp.mp3"
         mp3file.save("temp.mp3");
         //gets the old file and deletes it
-        File file = new File("../MusicPlayer/" + s.getFilename());
+        File file = new File(s.getFilename());
         if (file != null)
             file.delete();
         //renames the temp file to the actual file
-        File tempfile =new File("../MusicPlayer/temp.mp3");
-        File newfile =new File("../MusicPlayer/" + s.getFilename());
+        File tempfile =new File("src/Music/temp.mp3");
+        File newfile =new File(s.getFilename());
         s.setSongfile(tempfile);
         tempfile.renameTo(newfile);
         return s;
     }
 
-    public Song editSongDetails(Song original, Song changed) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
+    public SongInterface editSongDetails(SongInterface original, SongInterface changed) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
         Mp3File mp3file = new Mp3File(original.getFilelocation());
         ID3v2 id3v2Tag;
         id3v2Tag = new ID3v24Tag();
         mp3file.setId3v2Tag(id3v2Tag);
-        byte[] imageData = Files.readAllBytes(getSongImage(original).toPath());
+        byte[] imageData = Files.readAllBytes(getSongImage(changed).toPath());
 
         if (mp3file.hasId3v1Tag()) {
             mp3file.removeId3v1Tag();
@@ -170,8 +170,8 @@ public class AudioParser {
         mp3file.save("temp.mp3");
 
         //takes the file again, place it in a song file and delete the mp3 file
-        File file = new File("../MusicPlayer/temp.mp3");
-        Song s = getSongDetails("../MusicPlayer/temp.mp3");
+        File file = new File("src/Music/temp.mp3");
+        SongInterface s = getSongDetails("src/Music/temp.mp3");
         s.setSongfile(file);
         s.setUser(changed.getUser());
         file.delete();
@@ -218,7 +218,7 @@ public class AudioParser {
 
 
 
-            Song s = ap.getSongDetails("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
+            SongInterface s = ap.getSongDetails("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
             System.out.println(s.getLength());
 
             //MusicPlayerDB db = new MusicPlayerDB();
@@ -228,7 +228,7 @@ public class AudioParser {
             //s.setSongfile(new File(fileLocation));
             //s.setUser("A01");
             //ss.add(s);
-            Song song =  ss.getSong("S01", "A01");
+            SongInterface song =  ss.getSong("S01", "A01");
             File f = song.getSongfile();
             System.out.println(f.getName());
 
@@ -280,7 +280,7 @@ public class AudioParser {
 
             File newFile = new File("C:/Users/Shyrene/IdeaProjects/MusicPlayer/(G)I-DLE - Senorita.mp3");
 
-            Song sounds = ap.getSongDetails(newFile.getAbsolutePath());
+            SongInterface sounds = ap.getSongDetails(newFile.getAbsolutePath());
             sounds.setSongfile(newFile);
             sounds.setFilelocation(newFile.getAbsolutePath());
             sounds.setFilename(sounds.getArtist() + "-" + sounds.getName());
@@ -291,9 +291,9 @@ public class AudioParser {
             ImageIO.write(image, "jpg", newFile);*/
 
             File ff = new File("../MusicPlayer/MyMp3File.mp3");
-            Song newsong = ap.getSongDetails("C:/Users/Shyrene/IdeaProjects/MusicPlayer/MyMp3File.mp3");
+            SongInterface newsong = ap.getSongDetails("C:/Users/Shyrene/IdeaProjects/MusicPlayer/MyMp3File.mp3");
             newsong.setFilename("MyMp3File.mp3");
-            Song soo = ap.setSongImage(newsong, ap.getSongImage(sounds));
+            SongInterface soo = ap.setSongImage(newsong, ap.getSongImage(sounds));
             System.out.println(soo.getFilename());
 
 

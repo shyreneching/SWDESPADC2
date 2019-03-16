@@ -7,7 +7,7 @@ public class Account {
     
     private String username, password, name;
     private ObservableList<Playlist> playlists;
-    private ObservableList<Song> songs;
+    private ObservableList<SongInterface> songs;
 
     public Account(){
 
@@ -53,11 +53,11 @@ public class Account {
         this.playlists = playlists;
     }
 
-    public ObservableList<Song> getSongs() {
+    public ObservableList<SongInterface> getSongs() {
         return songs;
     }
 
-    public void setSongs(ObservableList<Song> songs) {
+    public void setSongs(ObservableList<SongInterface> songs) {
         this.songs = songs;
     }
     

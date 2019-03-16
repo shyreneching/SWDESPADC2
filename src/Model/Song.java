@@ -3,7 +3,7 @@ package Model;
 import java.io.File;
 import java.sql.Timestamp;
 
-public class Song {
+public class Song implements SongInterface{
     
     private String songid, name, genre, artist, album, user;
     private int year, trackNumber, length, timesplayed;
