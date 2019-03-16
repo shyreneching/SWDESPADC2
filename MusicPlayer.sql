@@ -1,7 +1,7 @@
 SET GLOBAL max_allowed_packet=1073741824;
 
-CREATE DATABASE IF NOT EXISTS MusicPlayer /*!40100 DEFAULT CHARACTER SET utf8*/;
-USE MusicPlayer;
+CREATE DATABASE  IF NOT EXISTS `musicplayer` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `musicplayer`;
 -- MySQL dump 10.13  Distrib 8.0.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: musicplayer
@@ -54,7 +54,9 @@ CREATE TABLE `playlist` (
   `idplaylist` varchar(15) NOT NULL,
   `playlistname` varchar(45) DEFAULT NULL,
   `username` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`idplaylist`)
+  PRIMARY KEY (`idplaylist`),
+  KEY `username_idx` (`username`),
+  CONSTRAINT `username` FOREIGN KEY (`username`) REFERENCES `accounts` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -107,9 +109,13 @@ DROP TABLE IF EXISTS `songcollection`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `songcollection` (
-  `idplaylist` int(11) NOT NULL,
-  `idsong` int(11) NOT NULL,
-  PRIMARY KEY (`idplaylist`,`idsong`)
+  `idplaylist` varchar(15) NOT NULL,
+  `idsong` varchar(15) NOT NULL,
+  PRIMARY KEY (`idplaylist`,`idsong`),
+  KEY `song_idx` (`idsong`),
+  KEY `song_id` (`idsong`),
+  CONSTRAINT `playlist` FOREIGN KEY (`idplaylist`) REFERENCES `playlist` (`idplaylist`),
+  CONSTRAINT `song` FOREIGN KEY (`idsong`) REFERENCES `song` (`idsong`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -133,7 +139,10 @@ CREATE TABLE `usersong` (
   `idsong` varchar(15) NOT NULL,
   `username` varchar(15) NOT NULL,
   `timesplayed` int(11) DEFAULT NULL,
-  PRIMARY KEY (`idsong`,`username`)
+  PRIMARY KEY (`idsong`,`username`),
+  KEY `user_idx` (`username`),
+  CONSTRAINT `fk_song` FOREIGN KEY (`idsong`) REFERENCES `song` (`idsong`),
+  CONSTRAINT `user` FOREIGN KEY (`username`) REFERENCES `accounts` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -143,7 +152,6 @@ CREATE TABLE `usersong` (
 
 LOCK TABLES `usersong` WRITE;
 /*!40000 ALTER TABLE `usersong` DISABLE KEYS */;
-INSERT INTO `usersong` VALUES ('S02','Le User',0);
 /*!40000 ALTER TABLE `usersong` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -156,4 +164,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-15 23:51:15
+-- Dump completed on 2019-03-17  2:13:34
