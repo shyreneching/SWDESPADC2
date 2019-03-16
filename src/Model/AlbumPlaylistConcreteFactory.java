@@ -1,0 +1,17 @@
+package Model;
+
+import javafx.collections.ObservableList;
+
+import java.sql.SQLException;
+
+public class AlbumPlaylistConcreteFactory extends PlaylistFactory {
+
+
+    public AlbumPlaylistConcreteFactory() {
+        super.playlistList = new UserPlaylist();
+    }
+
+    public ObservableList<Playlist> playlistFactoryMethod(String username) throws SQLException {
+        return playlistList.createPlaylist(username);
+    }
+}

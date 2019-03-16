@@ -1,0 +1,11 @@
+package Model;
+
+import javafx.collections.ObservableList;
+
+import java.sql.SQLException;
+
+public abstract class PlaylistFactory {
+    protected PlaylistList playlistList;
+
+    public abstract ObservableList<Playlist> playlistFactoryMethod(String username) throws SQLException;
+}

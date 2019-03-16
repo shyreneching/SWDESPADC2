@@ -1,6 +1,5 @@
 package Model;
 
-import Mp3agic.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -9,6 +8,10 @@ import java.sql.*;
 
 public class SongService implements Service{
     private JDBCConnectionPool pool;
+    long millis = System.currentTimeMillis();
+    Date date = new Date(millis);
+
+    Timestamp timestamp = new Timestamp(date.getTime());
 
     public SongService() {
         pool = new JDBCConnectionPool();
@@ -18,7 +21,7 @@ public class SongService implements Service{
     public boolean add(Object o) throws SQLException {
         SongInterface s = (Song) o;
         Connection connection = pool.checkOut();
-        String query = "INSERT INTO song VALUE (?, ?, ?, ?, ? ,?, ?, ?, ?, ?)";
+        String query = "INSERT INTO song VALUE (?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
         String query2 = "INSERT INTO usersong VALUE (?, ?, ?)";
         PreparedStatement statement2 = connection.prepareStatement(query2);
@@ -36,6 +39,7 @@ public class SongService implements Service{
             // Write the file into the database
             FileInputStream songfile = new FileInputStream(s.getSongfile());
             statement.setBinaryStream(10, songfile);
+            statement.setTimestamp(11, timestamp);
 
             statement2.setString(1, s.getSongid());
             statement2.setString(2, s.getUser());
@@ -81,10 +85,10 @@ public class SongService implements Service{
                 s.setSize(rs.getFloat("size"));
                 s.setSize(rs.getFloat("size"));
                 // sets the name to "Artist-title"
-                s.setFilename(s.getArtist() + "-"+ s.getName()+ ".mp3");
+                s.setFilename("src/Music/" + s.getArtist() + "-"+ s.getName()+ ".mp3");
 
                 //gets the song from the databse and make put it in a File datatype
-                File theFile = new File(s.getName());
+                File theFile = new File(s.getFilename());
                 OutputStream out = new FileOutputStream(theFile);
                 InputStream input = rs.getBinaryStream("songfile");
                 byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
@@ -94,6 +98,7 @@ public class SongService implements Service{
                 s.setSongfile(theFile);
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
+                s.setDate(rs.getTimestamp("dateupdated"));
 
                 songs.add(s);
             }
@@ -134,10 +139,10 @@ public class SongService implements Service{
                 s.setSize(rs.getFloat("size"));
                 s.setSize(rs.getFloat("size"));
                 // sets the name to "Artist-title"
-                s.setFilename(s.getArtist() + "-"+ s.getName()+ ".mp3");
+                s.setFilename("src/Music/" + s.getArtist() + "-"+ s.getName()+ ".mp3");
 
                 //gets the song from the databse and make put it in a File datatype
-                File theFile = new File(s.getName());
+                File theFile = new File(s.getFilename());
                 OutputStream out = new FileOutputStream(theFile);
                 InputStream input = rs.getBinaryStream("songfile");
                 byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
@@ -149,7 +154,7 @@ public class SongService implements Service{
                 s.setFilelocation(theFile.getAbsolutePath());
                 s.setUser(rs.getString("username"));
                 s.setTimesplayed(rs.getInt("timesplayed"));
-
+                s.setDate(rs.getTimestamp("dateupdated"));
                 songs.add(s);
             }
             return songs;
@@ -187,10 +192,10 @@ public class SongService implements Service{
                 s.setSize(rs.getFloat("size"));
 
                 // sets the name to "Artist-title"
-                s.setFilename(s.getArtist() + "-" + s.getName());
+                s.setFilename("src/Music/" + s.getArtist() + "-"+ s.getName()+ ".mp3");
 
                 //gets the song from the databse and make put it in a File datatype
-                File theFile = new File(s.getArtist() + "-" + s.getName() + ".mp3");
+                File theFile = new File(s.getFilename());
                 OutputStream out = new FileOutputStream(theFile);
                 InputStream input = rs.getBinaryStream("songfile");
                 byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
@@ -203,6 +208,7 @@ public class SongService implements Service{
                 s.setFilelocation(theFile.getAbsolutePath());
                 s.setUser(rs.getString("username"));
                 s.setTimesplayed(rs.getInt("timesplayed"));
+                s.setDate(rs.getTimestamp("dateupdated"));
                 return s;
             }
 
@@ -244,10 +250,10 @@ public class SongService implements Service{
                 s.setSize(rs.getFloat("size"));
 
                 // sets the name to "Artist-title"
-                s.setFilename(s.getArtist() + "-"+ s.getName()+ ".mp3");
+                s.setFilename("src/Music/" + s.getArtist() + "-"+ s.getName()+ ".mp3");
 
                 //gets the song from the databse and make put it in a File datatype
-                File theFile = new File(s.getName());
+                File theFile = new File(s.getFilename());
                 OutputStream out = new FileOutputStream(theFile);
                 InputStream input = rs.getBinaryStream("songfile");
                 byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
@@ -259,7 +265,7 @@ public class SongService implements Service{
                 s.setFilelocation(theFile.getAbsolutePath());
                 s.setUser(rs.getString("username"));
                 s.setTimesplayed(rs.getInt("timesplayed"));
-
+                s.setDate(rs.getTimestamp("dateupdated"));
                 songs.add(s);
             }
             return songs;
@@ -308,6 +314,7 @@ public class SongService implements Service{
     }
 
     public boolean update(String s, Object o){return false;}
+
     //pass the songid of the song that wants to be change and song class with COMPLETE information including the updates
     public boolean update(String songid, SongInterface s, String username) throws SQLException {
         Connection connection = pool.checkOut();

@@ -4,7 +4,7 @@ package Model;
 //import View.DashboardView;
 import java.util.ArrayList;
 
-public class Dashboard extends Model {
+public class Dashboard {
     
     private Account user;
     private ArrayList<SongInterface> songs;

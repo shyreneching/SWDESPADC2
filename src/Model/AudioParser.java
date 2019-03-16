@@ -32,7 +32,7 @@ public class AudioParser implements AudioParserInterface {
     * song location
     * song filename
     * */
-    public Song getSongDetails(String location){
+    public SongInterface getSongDetails(String location){
         String fileLocation = location;
         Song s = new Song();
 
@@ -59,15 +59,15 @@ public class AudioParser implements AudioParserInterface {
             s.setArtist(metadata.get("xmpDM:artist"));
             s.setAlbum(metadata.get("xmpDM:album"));
             s.setGenre(metadata.get("xmpDM:genre"));
-            if (!(metadata.get("xmpDM:releaseDate").equals("")))
+            if (!(metadata.get("xmpDM:releaseDate").equals("")) && metadata.get("xmpDM:releaseDate") != null)
                 s.setYear(Integer.parseInt(metadata.get("xmpDM:releaseDate")));
-            if (!(metadata.get("xmpDM:trackNumber").equals("")) || metadata.get("xmpDM:trackNumber") != null)
+            if (!(metadata.get("xmpDM:trackNumber").equals("")) && metadata.get("xmpDM:trackNumber") != null)
             s.setTrackNumber(Integer.parseInt(metadata.get("xmpDM:trackNumber")));
             Double d = Double.parseDouble(metadata.get("xmpDM:duration"));
             d =  d/1000;
             s.setLength(d.intValue());
             s.setFilelocation(location);
-            s.setFilename(s.getArtist() + "-" + s.getName()+ ".mp3");
+            s.setFilename("src/Music/" + s.getArtist() + "-" + s.getName()+ ".mp3");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -103,7 +103,7 @@ public class AudioParser implements AudioParserInterface {
          return null;
     }
 
-    public Song setSongImage(Song s, File image) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
+    public SongInterface setSongImage(SongInterface s, File image) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
         Mp3File mp3file = new Mp3File(s.getFilelocation());
         ID3v2 id3v2Tag;
         id3v2Tag = new ID3v24Tag();
@@ -125,23 +125,23 @@ public class AudioParser implements AudioParserInterface {
         //temporarily sets the file name to "temp.mp3"
         mp3file.save("temp.mp3");
         //gets the old file and deletes it
-        File file = new File("../MusicPlayer/" + s.getFilename());
+        File file = new File(s.getFilename());
         if (file != null)
             file.delete();
         //renames the temp file to the actual file
-        File tempfile =new File("../MusicPlayer/temp.mp3");
-        File newfile =new File("../MusicPlayer/" + s.getFilename());
+        File tempfile =new File("src/Music/temp.mp3");
+        File newfile =new File(s.getFilename());
         s.setSongfile(tempfile);
         tempfile.renameTo(newfile);
         return s;
     }
 
-    public Song editSongDetails(Song original, Song changed) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
+    public SongInterface editSongDetails(SongInterface original, SongInterface changed) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
         Mp3File mp3file = new Mp3File(original.getFilelocation());
         ID3v2 id3v2Tag;
         id3v2Tag = new ID3v24Tag();
         mp3file.setId3v2Tag(id3v2Tag);
-        byte[] imageData = Files.readAllBytes(getSongImage(original).toPath());
+        byte[] imageData = Files.readAllBytes(getSongImage(changed).toPath());
 
         if (mp3file.hasId3v1Tag()) {
             mp3file.removeId3v1Tag();
@@ -170,12 +170,12 @@ public class AudioParser implements AudioParserInterface {
         mp3file.save("temp.mp3");
 
         //takes the file again, place it in a song file and delete the mp3 file
-        File file = new File("../MusicPlayer/temp.mp3");
-        Song s = getSongDetails("../MusicPlayer/temp.mp3");
+        File file = new File("src/Music/temp.mp3");
+        SongInterface s = getSongDetails("src/Music/temp.mp3");
         s.setSongfile(file);
         s.setUser(changed.getUser());
         file.delete();
         return s;
     }
-
+    
 }

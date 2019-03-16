@@ -3,6 +3,7 @@ package Model;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.TimeZone;
 
 
 //The three remaining methods are abstract
@@ -19,7 +20,7 @@ public class JDBCConnectionPool extends ObjectPool<Connection> {
     public JDBCConnectionPool() {
         super();
         try {
-            Class.forName(DRIVER_NAME).newInstance();
+            Class.forName(DRIVER_NAME);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -28,7 +29,10 @@ public class JDBCConnectionPool extends ObjectPool<Connection> {
     @Override
     protected Connection create() {
         try {
-            return (DriverManager.getConnection(URL, USERNAME, PASSWORD));
+            return (DriverManager.getConnection(URL +
+                    DATABASE +
+                    "?autoReconnect=true&useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="
+                    + TimeZone.getDefault().getID(), USERNAME, PASSWORD));
         } catch (SQLException e) {
             e.printStackTrace();
             return (null);
