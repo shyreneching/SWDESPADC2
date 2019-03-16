@@ -11,6 +11,6 @@ public class YearPlaylistConcreteFactory extends PlaylistFactory {
     }
 
     public ObservableList<PlaylistInterface> playlistFactoryMethod(String username) throws SQLException {
-        return playlistList.createPlaylist(username);
+        return PlaylistList.createPlaylist(username);
     }
 }

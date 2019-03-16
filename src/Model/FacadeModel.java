@@ -99,6 +99,8 @@ public class FacadeModel{
             for (Object temp : accounts) {
                 if (((Account)temp).getUsername().compareTo(username) == 0 && ((Account)temp).getPassword().compareTo(password) == 0){
                     user = (Account) temp;
+                    user.setPlaylists(getUserPlaylist());
+                    user.setSongs(getUserSongs());
                     return true;
                 }
             }
@@ -152,6 +154,10 @@ public class FacadeModel{
         return false;
     }
 
+
+    public SongInterface getSong(String songid) throws SQLException {
+        return ((SongService)songService).getSong(songid, user.getUsername());
+    }
     /*Deletes one specific song in the database using songid
     * Automatically deletes the song in the playlist that contains the song*/
     public boolean deleteSong(String songid) throws SQLException {
@@ -256,6 +262,11 @@ public class FacadeModel{
         return b;
     }
 
+    public File getsongImage(SongInterface s) throws InvalidDataException, IOException, UnsupportedTagException {
+        return parser.getSongImage(s);
+    }
+
+
     /*Updates the album of the song given the new name and the song that wants to be changed*/
     public boolean playSong(SongInterface s) throws SQLException{
         s.setTimesplayed(s.getTimesplayed() + 1);
@@ -314,6 +325,12 @@ public class FacadeModel{
 
     /*Adds one song to the playlist*/
     public boolean addSongToPlaylist(SongInterface s, PlaylistInterface p) throws SQLException {
+        PlaylistInterface playlist = ((PlaylistService)playlistService).getPlaylist(p.getPlaylistid(), user.getUsername());
+        ObservableList<SongInterface> songs = playlist.getSongs();
+        for(SongInterface temp: songs){
+            if(temp.getSongid().equals(s.getSongid()))
+                return false;
+        }
         boolean b = ((PlaylistService)playlistService).addSongPlaylist(s, p.getPlaylistid());
         user.setPlaylists(getUserPlaylist());
         //update();
@@ -328,14 +345,45 @@ public class FacadeModel{
         return b;
     }
 
+    /*Takes specifc playlist*/
+    public PlaylistInterface getPlaylist(String playlistid) throws SQLException {
+        return ((PlaylistService)playlistService).getPlaylist(playlistid, user.getUsername());
+    }
+
+
     /*Takes all the playlist the user created*/
     public ObservableList<PlaylistInterface> getUserPlaylist() throws SQLException {
-        ObservableList<PlaylistInterface> playlists  = ((PlaylistService)playlistService).getUserPlaylist(user.getUsername());
+        PlaylistFactory playlistFactory = new AlbumPlaylistConcreteFactory();
+        ObservableList<PlaylistInterface> playlists = playlistFactory.playlistFactoryMethod(user.getUsername());
         if(playlists != null) {
             setGroups(playlists);
             return playlists;
         }
         return null;
+    }
+
+    /*Returns list of playlist grouped by album*/
+    public ObservableList<PlaylistInterface> getAlbumPlaylist() throws SQLException {
+        PlaylistFactory playlistFactory = new AlbumPlaylistConcreteFactory();
+        return playlistFactory.playlistFactoryMethod(user.getUsername());
+    }
+
+    /*Returns list of playlist grouped by artist*/
+    public ObservableList<PlaylistInterface> getArtistPlaylist() throws SQLException {
+        PlaylistFactory playlistFactory = new ArtistPlaylistConcreteFactory();
+        return playlistFactory.playlistFactoryMethod(user.getUsername());
+    }
+
+    /*Returns list of playlist grouped by year*/
+    public ObservableList<PlaylistInterface> getYearPlaylist() throws SQLException {
+        PlaylistFactory playlistFactory = new YearPlaylistConcreteFactory();
+        return playlistFactory.playlistFactoryMethod(user.getUsername());
+    }
+
+    /*Returns list of playlist grouped by genre*/
+    public ObservableList<PlaylistInterface> getGenrePlaylist() throws SQLException {
+        PlaylistFactory playlistFactory = new GenrePlaylistConcreteFactory();
+        return playlistFactory.playlistFactoryMethod(user.getUsername());
     }
 
     /*Deletes the playlist in the database*/
