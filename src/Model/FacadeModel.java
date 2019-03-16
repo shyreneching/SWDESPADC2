@@ -14,14 +14,14 @@ import java.sql.SQLException;
 
 public class FacadeModel extends Model {
     private Account user;
-    private ObservableList<Song> songs;
+    private ObservableList<SongInterface> songs;
     private ObservableList<Playlist> groups;
-    private Song currentSong;
+    private SongInterface currentSong;
 
     private Service accountService;
     private Service playlistService;
     private Service songService;
-    private AudioParser parser;
+    private AudioParserInterface parser;
 
     public FacadeModel() {
         songs = FXCollections.observableArrayList();
@@ -36,11 +36,11 @@ public class FacadeModel extends Model {
         super.attach(view);
     }
 */
-    public Song getCurrentSong() {
+    public SongInterface getCurrentSong() {
         return currentSong;
     }
 
-    public void setCurrentSong(Song currentSong) {
+    public void setCurrentSong(SongInterface currentSong) {
         this.currentSong = currentSong;
         //super.update();
     }
@@ -54,11 +54,11 @@ public class FacadeModel extends Model {
         //super.update();
     }
 
-    public ObservableList<Song> getSongs() {
+    public ObservableList<SongInterface> getSongs() {
         return songs;
     }
 
-    public void setSongs(ObservableList<Song> songs) {
+    public void setSongs(ObservableList<SongInterface> songs) {
         this.songs = songs;
         //super.update();
     }
@@ -99,7 +99,7 @@ public class FacadeModel extends Model {
     public boolean addSong(String filelocation) throws SQLException {
         ObservableList<Object> songs = null;
         songs = songService.getAll();
-        Song s = new Song();
+        SongInterface s = new Song();
         File songFile = new File(filelocation);
         s.setSongfile(songFile);
         s = parser.getSongDetails(filelocation);

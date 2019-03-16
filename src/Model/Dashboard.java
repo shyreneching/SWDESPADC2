@@ -7,9 +7,9 @@ import java.util.ArrayList;
 public class Dashboard extends Model {
     
     private Account user;
-    private ArrayList<Song> songs;
+    private ArrayList<SongInterface> songs;
     private ArrayList<Playlist> groups;
-    private Song currentSong;
+    private SongInterface currentSong;
 
     public Dashboard() {
         songs = new ArrayList<>();
@@ -26,11 +26,11 @@ public class Dashboard extends Model {
         return false;
     }
 
-    public Song getCurrentSong() {
+    public SongInterface getCurrentSong() {
         return currentSong;
     }
 
-    public void setCurrentSong(Song currentSong) {
+    public void setCurrentSong(SongInterface currentSong) {
         this.currentSong = currentSong;
         /*super.notifyView();*/
     }
@@ -44,11 +44,11 @@ public class Dashboard extends Model {
         /*super.notifyView();*/
     }
 
-    public ArrayList<Song> getSongs() {
+    public ArrayList<SongInterface> getSongs() {
         return songs;
     }
 
-    public void setSongs(ArrayList<Song> songs) {
+    public void setSongs(ArrayList<SongInterface> songs) {
         this.songs = songs;
         /*super.notifyView();*/
     }

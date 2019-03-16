@@ -2,10 +2,10 @@ package Model;
 
 import javafx.collections.ObservableList;
 
-public class Playlist {
+public class Playlist implements PlaylistInterface {
     
     private String playlistid, name;
-    private ObservableList<Song> songs;
+    private ObservableList<SongInterface> songs;
 
     public String getPlaylistid() {
         return playlistid;
@@ -23,11 +23,11 @@ public class Playlist {
         this.name = name;
     }
     
-    public ObservableList<Song> getSongs() {
+    public ObservableList<SongInterface> getSongs() {
         return songs;
     }
 
-    public void setSongs(ObservableList<Song> songs) {
+    public void setSongs(ObservableList<SongInterface> songs) {
         this.songs = songs;
     }
     
