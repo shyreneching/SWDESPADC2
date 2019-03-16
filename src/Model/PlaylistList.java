@@ -5,5 +5,7 @@ import javafx.collections.ObservableList;
 import java.sql.SQLException;
 
 public interface PlaylistList {
-    public ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException;
+    public static ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
+        return null;
+    }
 }
