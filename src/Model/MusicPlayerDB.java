@@ -21,7 +21,8 @@ public class MusicPlayerDB {
             Class.forName(DRIVER_NAME);
             Connection connection = DriverManager.getConnection(
                     URL +
-                            DATABASE + "?autoReconnect=true&useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=" + TimeZone.getDefault().getID(),
+                            DATABASE + "?autoReconnect=true&useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone="
+                            + TimeZone.getDefault().getID(),
                     USERNAME,
                     PASSWORD);
             System.out.println("[MYSQL} Connection successful!");

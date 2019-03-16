@@ -102,6 +102,7 @@ public class FacadeModel extends Model {
         Song s = new Song();
         File songFile = new File(filelocation);
         s.setSongfile(songFile);
+        s.setSize(songFile.length());
         s = parser.getSongDetails(filelocation);
         s.setUser(this.user.getUsername());
 
@@ -111,9 +112,15 @@ public class FacadeModel extends Model {
                 return true;
             }
         } else {
-            s.setSongid(String.format("S%02d", songs.size() + 1));
-            if(songService.add(s)){
-                return true;
+            for (Object temp : songs) {
+                if (((Song) temp).getName().compareToIgnoreCase(s.getName()) != 0
+                        && ((Song) temp).getArtist().compareToIgnoreCase(s.getArtist()) != 0
+                        && ((Song) temp).getAlbum().compareToIgnoreCase(s.getAlbum()) != 0) {
+                    s.setSongid(String.format("S%02d", songs.size() + 1));
+                    if (songService.add(s)) {
+                        return true;
+                    }
+                }
             }
         }
 
@@ -128,6 +135,28 @@ public class FacadeModel extends Model {
     
     public boolean updateSong() {
         return false;
+    }
+
+    /*Returns all the songs in the database*/
+    public ObservableList<Song> getAllSong() throws SQLException {
+        ObservableList<Object> o = songService.getAll();
+        ObservableList<Song> songs = null;
+        if(o != null) {
+            for (Object temp : o) {
+                songs.add((Song)temp);
+            }
+            return songs;
+        }
+        return null;
+    }
+
+    /*Returns the songs that the user imported*/
+    public ObservableList<Song> getUserSong() throws SQLException {
+        ObservableList<Song> songs  = ((SongService)songService).getUserSong(user.getUsername());
+        if(songs != null) {
+            return songs;
+        }
+        return null;
     }
 
     /*Adds the playlist in the database*/
@@ -146,7 +175,6 @@ public class FacadeModel extends Model {
                 return true;
             }
         }
-
         return false;
     }
 

@@ -1,12 +1,14 @@
 package Model;
 
 import java.io.File;
+import java.sql.Timestamp;
 
 public class Song {
     
     private String songid, name, genre, artist, album, user;
     private int year, trackNumber, length, timesplayed;
     private double size;
+    private Timestamp date;
     private File songfile;
     private String filename, filelocation;
 
@@ -92,6 +94,15 @@ public class Song {
 
     public void setSize(double size) {
         this.size = size;
+    }
+
+
+    public Timestamp getDate() {
+        return date;
+    }
+
+    public void setDate(Timestamp date) {
+        this.date = date;
     }
 
     public int getTimesplayed() {

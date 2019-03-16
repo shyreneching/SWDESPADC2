@@ -59,9 +59,9 @@ public class AudioParser {
             s.setArtist(metadata.get("xmpDM:artist"));
             s.setAlbum(metadata.get("xmpDM:album"));
             s.setGenre(metadata.get("xmpDM:genre"));
-            if (!(metadata.get("xmpDM:releaseDate").equals("")))
+            if (!(metadata.get("xmpDM:releaseDate").equals("")) && metadata.get("xmpDM:releaseDate") != null)
                 s.setYear(Integer.parseInt(metadata.get("xmpDM:releaseDate")));
-            if (!(metadata.get("xmpDM:trackNumber").equals("")) || metadata.get("xmpDM:trackNumber") != null)
+            if (!(metadata.get("xmpDM:trackNumber").equals("")) && metadata.get("xmpDM:trackNumber") != null)
             s.setTrackNumber(Integer.parseInt(metadata.get("xmpDM:trackNumber")));
             Double d = Double.parseDouble(metadata.get("xmpDM:duration"));
             d =  d/1000;
@@ -221,8 +221,8 @@ public class AudioParser {
             Song s = ap.getSongDetails("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
             System.out.println(s.getLength());
 
-            MusicPlayerDB db = new MusicPlayerDB();
-            SongService ss = new SongService(db);
+            //MusicPlayerDB db = new MusicPlayerDB();
+            SongService ss = new SongService();
             //s.setSongid("S01");
             //s.setFilelocation("C:/Users/Shyrene/Downloads/Music/Taeyeon - I’m the Greatest.mp3");
             //s.setSongfile(new File(fileLocation));
