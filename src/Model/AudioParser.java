@@ -296,7 +296,7 @@ public class AudioParser implements AudioParserInterface{
             /*InputStream ios = new FileInputStream(ap.getSongImage(sounds));
             byte[] fileContent = Files.readAllBytes(ap.getSongImage(sounds).toPath());
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(fileContent));
-            ImageIO.write(image, "jpg", newFile);*/
+            ImageIO.write(image, "jpg", newFile);*//*
 
             File ff = new File("../MusicPlayer/MyMp3File.mp3");
             SongInterface newsong = ap.getSongDetails("C:/Users/Shyrene/IdeaProjects/MusicPlayer/MyMp3File.mp3");

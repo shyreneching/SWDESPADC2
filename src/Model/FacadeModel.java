@@ -262,7 +262,7 @@ public class FacadeModel{
         return b;
     }
 
-    public File getsongImage(SongInterface s) throws InvalidDataException, IOException, UnsupportedTagException {
+    public File getsongImage(SongInterface s) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
         return parser.getSongImage(s);
     }
 
