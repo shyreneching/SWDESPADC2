@@ -96,7 +96,6 @@ public class Song implements SongInterface{
         this.size = size;
     }
 
-
     public Timestamp getDate() {
         return date;
     }
