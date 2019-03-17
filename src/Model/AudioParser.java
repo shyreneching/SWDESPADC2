@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.sql.SQLException;
 import java.sql.SQLOutput;
 
+import jaco.mp3.player.MP3Player;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -34,7 +35,7 @@ public class AudioParser implements AudioParserInterface{
     * */
     public SongInterface getSongDetails(String location){
         String fileLocation = location;
-        Song s = new Song();
+        SongInterface s = new Song();
 
         try {
             InputStream input = new FileInputStream(new File(fileLocation));
@@ -323,4 +324,23 @@ public class AudioParser implements AudioParserInterface{
             e.printStackTrace();
         }
     }*/
+
+    public static void main(String args[]) throws SQLException {
+        String filelocation = "src/Music/Bea Miller - Fire N Gold.mp3";
+        SongInterface song = CreateSongFromLocal.CreateSong(filelocation);
+        song.setSongid("S01");
+        song.setUser("User");
+
+        SongService songService = new SongService();
+        songService.add(song);
+
+        MP3Player mp3Player = new MP3Player();
+        for(Object s : songService.getAll()){
+            mp3Player.addToPlayList(((SongInterface)s).getSongfile());
+        }
+        mp3Player.play();
+        while (true){
+
+        }
+    }
 }

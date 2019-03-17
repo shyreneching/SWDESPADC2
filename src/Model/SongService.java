@@ -45,8 +45,8 @@ public class SongService implements Service{
             statement2.setString(2, s.getUser());
             statement2.setInt(3, s.getTimesplayed());
 
-            statement2.execute();
             boolean added = statement.execute();
+            statement2.execute();
 
             return added;
         } catch (SQLException e){

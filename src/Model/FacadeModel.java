@@ -118,11 +118,10 @@ public class FacadeModel{
     public boolean addSong(String filelocation) throws SQLException {
         ObservableList<Object> songs = null;
         songs = songService.getAll();
-        SongInterface s = new Song();
+        SongInterface s = parser.getSongDetails(filelocation);
         File songFile = new File(filelocation);
         s.setSongfile(songFile);
         s.setSize(songFile.length());
-        s = parser.getSongDetails(filelocation);
         s.setUser(this.user.getUsername());
 
         if (songs == null) {
