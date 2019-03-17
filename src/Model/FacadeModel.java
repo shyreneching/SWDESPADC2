@@ -28,6 +28,7 @@ public class FacadeModel{
     private Service songService;
     private AudioParserInterface parser;
     private ObservableList<View> view;
+    private PlaylistInterface queue;
 
     public FacadeModel() {
         songs = FXCollections.observableArrayList();
@@ -36,9 +37,10 @@ public class FacadeModel{
         accountService = new AccountService();
         playlistService = new PlaylistService();
         songService = new SongService();
-        parser = new AudioParser(); 
+        parser = new AudioParser();
+        queue = new Queue();
     }
-  
+
     public void attach(View view) {
         this.view.add(view);
     }
@@ -414,5 +416,12 @@ public class FacadeModel{
     public void setSelectedSong(SongInterface selectedSong) {
         this.selectedSong = selectedSong;
     }
-    
+
+    public PlaylistInterface getQueue() {
+        return queue;
+    }
+
+    public void setQueue(PlaylistInterface queue) {
+        this.queue = queue;
+    }
 }

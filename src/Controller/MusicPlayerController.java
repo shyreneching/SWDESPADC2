@@ -21,8 +21,7 @@ import javafx.stage.Stage;
  */
 public class MusicPlayerController {
     
-    private FacadeModel model;   
-    private Queue list;
+    private FacadeModel model;
     private List<MediaPlayer> songs;
     private Stage stage;
     
@@ -38,7 +37,6 @@ public class MusicPlayerController {
         this.model = model;
         this.main = main;
         this.stage = stage;
-        list = new Queue();
         songs = new ArrayList<>();
         repeat = 0;
         mute = false;
@@ -85,7 +83,7 @@ public class MusicPlayerController {
 
     public void setShuffle(boolean shuffle) {
         this.shuffle = shuffle;
-        list.setShuffle(this.shuffle);
+        ((Queue)model.getQueue()).setShuffle(this.shuffle);
     }
 
     public int getRepeat() {
