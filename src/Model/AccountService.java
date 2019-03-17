@@ -154,7 +154,7 @@ public class AccountService implements Service{
         String query = "UPDATE accounts SET "
                 + "name = ?, "
                 + "password = ?, "
-                + " WHERE username= ?";
+                + "WHERE username= ?";
         PreparedStatement statement = connection.prepareStatement(query);
         try {
 

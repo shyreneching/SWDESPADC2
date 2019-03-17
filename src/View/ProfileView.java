@@ -71,6 +71,7 @@ public class ProfileView extends View {
             save.setDisable(false);
             cancel.setVisible(true);
             cancel.setDisable(false);
+            displ
         });
 
         save.setOnAction(event -> {
