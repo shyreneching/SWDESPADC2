@@ -10,7 +10,8 @@ public class Account implements AccountInterface {
     private ObservableList<SongInterface> songs;
 
     public Account(){
-
+        playlists = FXCollections.observableArrayList();
+        songs = FXCollections.observableArrayList();
     }
 
     public Account(String name, String username, String password) {

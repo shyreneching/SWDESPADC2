@@ -322,11 +322,12 @@ public class SongService implements Service{
         try {
             statement.setString(1, songid);
             statement.setString(2, a.getUsername());
-            for (PlaylistInterface p: a.getPlaylists()) {
-                statement2.setString(1, songid);
-                statement2.setString(2, p.getPlaylistid());
-                statement2.execute();
-            }
+            if(a.getPlaylists() != null)
+                for (PlaylistInterface p: a.getPlaylists()) {
+                    statement2.setString(1, songid);
+                    statement2.setString(2, p.getPlaylistid());
+                    statement2.execute();
+                }
             boolean deleted  = statement.execute();
             return deleted;
         } catch (SQLException e){

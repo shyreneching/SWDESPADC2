@@ -326,17 +326,20 @@ public class AudioParser implements AudioParserInterface{
     }*/
 
     public static void main(String args[]) throws SQLException {
-        String filelocation = "src/Music/Bea Miller - Fire N Gold.mp3";
+        String filelocation = "src/Music/Echosmith - Bright.mp3";
         SongInterface song = CreateSongFromLocal.CreateSong(filelocation);
         song.setSongid("S01");
         song.setUser("User");
         AccountService accountService = new AccountService();
+        AccountInterface account;
         if (accountService.getAll().size() == 0) {
-            Account account = new Account();
+            account = new Account();
             account.setUsername("User");
             account.setName("Ima User");
             account.setPassword("password");
             accountService.add(account);
+        } else {
+            account = (Account)accountService.getAll().get(0);
         }
         SongService songService = new SongService();
         if (songService.getAll().size() == 0)
@@ -348,7 +351,8 @@ public class AudioParser implements AudioParserInterface{
         }
         mp3Player.play();
         while (true){
-
+            if(mp3Player.isStopped())
+                break;
         }
     }
 }
