@@ -17,8 +17,23 @@ public class Queue implements PlaylistInterface {
     public int getNextTrack(int currTrack){
         if (trackNo.indexOf(currTrack) != trackNo.size() - 1)
             return trackNo.get(trackNo.indexOf(currTrack) + 1);
-        else
-            return -1;
+        else {
+            if(repeat == true)
+                return trackNo.get(0);
+            else
+                return -1;
+        }
+    }
+
+    public int getPrevTrack(int currTrack){
+        if (trackNo.indexOf(currTrack) != 0)
+            return trackNo.get(trackNo.indexOf(currTrack) - 1);
+        else{
+            if(repeat == true)
+                return trackNo.get(trackNo.size() - 1);
+            else
+                return -1;
+        }
     }
 
     public void addSong(SongInterface song){
