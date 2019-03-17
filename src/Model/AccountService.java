@@ -15,7 +15,7 @@ public class AccountService implements Service{
 
     //adds account to the database. Must be COMPLETE information
     public boolean add(Object o) throws SQLException {
-        AccountInterface a = (Account) o;
+        Account a = (Account) o;
 
         // Get a connection:
         Connection connection = pool.checkOut();
@@ -52,7 +52,7 @@ public class AccountService implements Service{
 
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
-                AccountInterface a = new Account();
+                Account a = new Account();
                 a.setUsername(rs.getString("username"));
                 a.setPassword(rs.getString("password"));
                 a.setName(rs.getString("name"));
@@ -70,7 +70,7 @@ public class AccountService implements Service{
     }
 
     //gets one specific account with the username as a parameter
-    public AccountInterface getAccount(String username) throws SQLException {
+    public Account getAccount(String username) throws SQLException {
         // Get a connection:
         Connection connection = pool.checkOut();
 
@@ -80,7 +80,7 @@ public class AccountService implements Service{
 
             ResultSet rs = statement.executeQuery();
             if(rs.next()) {
-                AccountInterface a = new Account();
+                Account a = new Account();
                 a.setUsername(rs.getString("username"));
                 a.setPassword(rs.getString("password"));
                 a.setName(rs.getString("name"));
@@ -150,10 +150,10 @@ public class AccountService implements Service{
         // Get a connection:
         Connection connection = pool.checkOut();
 
-        AccountInterface a = (Account) o;
+        Account a = (Account) o;
         String query = "UPDATE accounts SET "
                 + "name = ?, "
-                + "password = ?, "
+                + "password = ? "
                 + "WHERE username= ?";
         PreparedStatement statement = connection.prepareStatement(query);
         try {

@@ -3,15 +3,14 @@ package Model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class Account implements AccountInterface {
+public class Account {
     
     private String username, password, name;
     private ObservableList<PlaylistInterface> playlists;
     private ObservableList<SongInterface> songs;
 
     public Account(){
-        playlists = FXCollections.observableArrayList();
-        songs = FXCollections.observableArrayList();
+
     }
 
     public Account(String name, String username, String password) {
@@ -43,7 +42,7 @@ public class Account implements AccountInterface {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name + " ";
     }
 
     public ObservableList<PlaylistInterface> getPlaylists() {

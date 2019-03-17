@@ -6,10 +6,14 @@ import javafx.collections.ObservableList;
 import java.sql.SQLException;
 
 public class ArtistPlaylist implements PlaylistList {
+    public SongService songService;
 
-    public static ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
-        Service songService = new SongService();
-        ObservableList<SongInterface> songs = ((SongService)songService).getUserSong(username);
+    public ArtistPlaylist() {
+        this.songService = new SongService();
+    }
+
+    public ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
+        ObservableList<SongInterface> songs = songService.getUserSong(username);
         ObservableList<PlaylistInterface> playlists = FXCollections.observableArrayList();
         boolean added = false;
 

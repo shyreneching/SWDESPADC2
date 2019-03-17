@@ -1,22 +1,23 @@
 package View;
 
+import Model.FacadeModel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.awt.*;
 import java.io.IOException;
+import java.sql.SQLException;
+import javafx.scene.control.Label;
 
 public class LoginView extends View {
-    //private Login model;
+
+    private FacadeModel model;
 
     @FXML
     private TextField username;
@@ -25,72 +26,65 @@ public class LoginView extends View {
     @FXML
     private Button login, signup, closelogin;
     @FXML
-    private Label unknownusername, incorrectpassword;
+    private Label errormessage;
 
     private FXMLLoader loader;
     private Stage stage;
     private Scene scene;
     private Parent root;
 
-    public LoginView (Stage stage) {
-    	this.stage = stage;
-        //this.model = model;
-    	try {
+    public LoginView(FacadeModel model) {
+        this.model = model;
+        try {
             loader = new FXMLLoader(getClass().getResource("/View/Login.fxml"));
             loader.setController(this);
             root = (Parent) loader.load();
-            System.out.println("test");
             scene = new Scene(root);
 
-            this.stage.setTitle("Login");
-            this.stage.setScene(scene);
-            this.stage.setResizable(false);
-            this.stage.initStyle(StageStyle.UNDECORATED);
-            this.stage.show();
+            stage = new Stage();
+            stage.setTitle("Login");
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
         } catch (IOException ie) {
         }
-
-
+        
+        init();
     }
 
-    public void initialize () {
+    public void initialize() {
+        login.setDefaultButton(true);
         closelogin.setOnAction(event -> {
-           stage.close();
+            stage.close();
         });
 
         login.setOnAction(event -> {
-            System.out.println("Logged in");
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Profile.fxml"));
-                Parent root = (Parent) loader.load();
-                Scene scene = new Scene(root);
+            if (username.getText().trim().isEmpty() || password.getText().trim().isEmpty()) {
+                errormessage.setText("**Please input a valid username and password**");
+                errormessage.setVisible(true);
+            } else {
+                try {
+                    if (model.login(username.getText().trim(), password.getText().trim())) {
+                        stage.close();
+                    } else {
+                        errormessage.setText("**Incorrect username or password**");
+                        errormessage.setVisible(true);
+                    }
+                } catch (SQLException ex) {
 
-                Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-                stage.setScene(scene);
-                stage.show();
-            } catch (IOException ex) {
+                }
             }
         });
 
         signup.setOnAction(event -> {
-            System.out.println("Sign Up??");
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/SignUp.fxml"));
-                Parent root = (Parent) loader.load();
-                Scene scene = new Scene(root);
-
-                Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-                stage.setScene(scene);
-                stage.show();
-            } catch (IOException ex) {
-            }
-
+            SignupView view = new SignupView(model);
+            stage.close();
         });
     }
 
-    private void init () {
-        unknownusername.setVisible(false);
-        incorrectpassword.setVisible(false);
+    private void init() {
+        errormessage.setVisible(false);
     }
 
     @Override

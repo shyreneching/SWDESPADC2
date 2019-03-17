@@ -2,11 +2,12 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- */
+ *//*
+
 package View;
 
 import Controller.MusicPlayerController;
-import Model.MusicPlayer;
+
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
@@ -19,10 +20,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.stage.Stage;
 
+*/
 /**
  *
  * @author Stanley Sie
- */
+ *//*
+
 public class MusicPlayerView extends View {
 
     private MusicPlayer model;
@@ -85,3 +88,4 @@ public class MusicPlayerView extends View {
     }
 
 }
+*/

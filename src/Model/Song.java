@@ -2,18 +2,43 @@ package Model;
 
 import java.io.File;
 import java.sql.Timestamp;
+import javafx.scene.control.Button;
 
 public class Song implements SongInterface{
     
-    private String songid, name, genre, artist, album, user;
+    private String songid, name, genre, artist, album, user, duration;
     private int year, trackNumber, length, timesplayed;
     private double size;
     private Timestamp date;
     private File songfile;
     private String filename, filelocation;
+    private Button play, edit, add, del;
 
     public Song(){
         timesplayed = 0;
+        play = new Button();
+        edit = new Button();
+        add = new Button();
+        del = new Button();
+        
+        play.setPrefSize(30, 30);
+        edit.setPrefSize(30, 30);
+        add.setPrefSize(30, 30);
+        del.setPrefSize(30, 30);
+        
+        play.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
+                + "-fx-background-image: url('/Pictures/play.png');");
+        edit.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
+                + "-fx-background-image: url('/Pictures/edit.png');");
+        add.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
+                + "-fx-background-image: url('/Pictures/add.png');");
+        del.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
+                + "-fx-background-image: url('/Pictures/delete.png');");
+        
+        play.setVisible(false);
+        edit.setVisible(false);
+        add.setVisible(false);
+        del.setVisible(false);
     }
 
     public String getSongid() {
@@ -86,6 +111,7 @@ public class Song implements SongInterface{
 
     public void setLength(int length) {
         this.length = length;
+        duration = String.format("%02d", length/60) + ":" + String.format("%02d", length%60);
     }
 
     public double getSize() {
@@ -95,6 +121,7 @@ public class Song implements SongInterface{
     public void setSize(double size) {
         this.size = size;
     }
+
 
     public Timestamp getDate() {
         return date;
@@ -134,5 +161,26 @@ public class Song implements SongInterface{
 
     public void setFilelocation(String filelocation) {
         this.filelocation = filelocation;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public Button getPlay() {
+        return play;
+    }
+
+    public Button getEdit() {
+        return edit;
+    }
+
+    public Button getAdd() {
+        return add;
+    }
+
+    @Override
+    public Button getDel() {
+        return del;
     }
 }

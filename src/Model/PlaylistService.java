@@ -19,7 +19,7 @@ public class PlaylistService implements Service{
     public boolean add(Object o) throws SQLException{return false;}
 
     //adds playlist class and the account that owns the playlist. Songs in the playlist must already be imported to the database beforehand
-    public boolean add(PlaylistInterface p, AccountInterface a) throws SQLException {
+    public boolean add(PlaylistInterface p, Account a) throws SQLException {
         Connection connection = pool.checkOut();
         String query = "INSERT INTO playlist VALUE (?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);

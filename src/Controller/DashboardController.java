@@ -2,7 +2,8 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- */
+ *//*
+
 package Controller;
 
 import Model.Account;
@@ -14,10 +15,12 @@ import Model.Song;
 import View.DashboardView;
 import javafx.stage.Stage;
 
+*/
 /**
  *
  * @author Stanley Sie
- */
+ *//*
+
 public class DashboardController implements Controller {
     
     private Dashboard dashboardModel;
@@ -79,3 +82,4 @@ public class DashboardController implements Controller {
     
     
 }
+*/
