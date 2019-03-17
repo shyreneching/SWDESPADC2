@@ -3,7 +3,7 @@ package Model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class Account {
+public class Account implements AccountInterface {
     
     private String username, password, name;
     private ObservableList<PlaylistInterface> playlists;

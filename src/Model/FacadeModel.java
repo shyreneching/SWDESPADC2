@@ -19,7 +19,7 @@ import java.io.ObjectInput;
 import java.sql.SQLException;
 
 public class FacadeModel{
-    private Account user;
+    private AccountInterface user;
     private ObservableList<SongInterface> songs;
     private ObservableList<PlaylistInterface> groups;
     private SongInterface currentSong;
@@ -61,11 +61,11 @@ public class FacadeModel{
         //update();
     }
     
-    public Account getUser() {
+    public AccountInterface getUser() {
         return user;
     }
 
-    public void setUser(Account user) {
+    public void setUser(AccountInterface user) {
         this.user = user;
         //update();
     }
@@ -113,15 +113,18 @@ public class FacadeModel{
         //update();
     }
 
+    public void addSongLocally(String filelocation){
+        if(songs == null)
+            songs = FXCollections.observableArrayList();
+        songs.add(CreateSongFromLocal.CreateSong(filelocation));
+    }
+
     /*Add/import one song to the database under the current user
     * */
     public boolean addSong(String filelocation) throws SQLException {
         ObservableList<Object> songs = null;
         songs = songService.getAll();
-        SongInterface s = parser.getSongDetails(filelocation);
-        File songFile = new File(filelocation);
-        s.setSongfile(songFile);
-        s.setSize(songFile.length());
+        SongInterface s = CreateSongFromLocal.CreateSong(filelocation);
         s.setUser(this.user.getUsername());
 
         if (songs == null) {

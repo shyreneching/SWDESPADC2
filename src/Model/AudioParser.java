@@ -60,9 +60,9 @@ public class AudioParser implements AudioParserInterface{
             s.setArtist(metadata.get("xmpDM:artist"));
             s.setAlbum(metadata.get("xmpDM:album"));
             s.setGenre(metadata.get("xmpDM:genre"));
-            if (!(metadata.get("xmpDM:releaseDate").equals("")) && metadata.get("xmpDM:releaseDate") != null)
+            if (metadata.get("xmpDM:releaseDate") != null && !(metadata.get("xmpDM:releaseDate").equals("")))
                 s.setYear(Integer.parseInt(metadata.get("xmpDM:releaseDate")));
-            if (!(metadata.get("xmpDM:trackNumber").equals("")) && metadata.get("xmpDM:trackNumber") != null)
+            if (metadata.get("xmpDM:trackNumber") != null && !(metadata.get("xmpDM:trackNumber").equals("")))
             s.setTrackNumber(Integer.parseInt(metadata.get("xmpDM:trackNumber")));
             Double d = Double.parseDouble(metadata.get("xmpDM:duration"));
             d =  d/1000;
@@ -330,9 +330,17 @@ public class AudioParser implements AudioParserInterface{
         SongInterface song = CreateSongFromLocal.CreateSong(filelocation);
         song.setSongid("S01");
         song.setUser("User");
-
+        AccountService accountService = new AccountService();
+        if (accountService.getAll().size() == 0) {
+            Account account = new Account();
+            account.setUsername("User");
+            account.setName("Ima User");
+            account.setPassword("password");
+            accountService.add(account);
+        }
         SongService songService = new SongService();
-        songService.add(song);
+        if (songService.getAll().size() == 0)
+            songService.add(song);
 
         MP3Player mp3Player = new MP3Player();
         for(Object s : songService.getAll()){

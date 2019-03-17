@@ -311,7 +311,7 @@ public class SongService implements Service{
     public boolean delete(String s){return false;}
 
     //pass the song id to delete the specific song
-    public boolean delete(String songid, Account a) throws SQLException {
+    public boolean delete(String songid, AccountInterface a) throws SQLException {
         Connection connection = pool.checkOut();
         String query = "DELETE FROM usersong " +
                 "WHERE idsong = ? AND username = ?";
