@@ -20,12 +20,9 @@ import javafx.stage.Stage;
 public class FacadeController {
     
     private FacadeModel model;
-    public MusicPlayerController musicPlayer;
     
-    public FacadeController(FacadeModel model, Stage stage) {
+    public FacadeController(FacadeModel model) {
         this.model = model;
-        this.model.attach(new DashboardView(stage, this.model, this));
-        musicPlayer = new MusicPlayerController(this.model, stage, this);
     }
     
     public void createPlaylist() {

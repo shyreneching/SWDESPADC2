@@ -4,14 +4,10 @@ import javafx.collections.ObservableList;
 import java.sql.SQLException;
 
 public class UserPlaylist implements PlaylistList {
-    public PlaylistService playlistService;
 
-    public UserPlaylist() {
-        this.playlistService = new PlaylistService();
-    }
-
-    public ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
-        ObservableList<PlaylistInterface> playlists = playlistService.getUserPlaylist(username);
+    public static ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
+        Service playlistService = new PlaylistService();
+        ObservableList<PlaylistInterface> playlists = ((PlaylistService)playlistService).getUserPlaylist(username);
         return playlists;
     }
 

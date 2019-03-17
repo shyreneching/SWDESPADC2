@@ -7,6 +7,7 @@ package Driver;
 
 import Controller.FacadeController;
 import Model.FacadeModel;
+import View.DashboardView;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -18,7 +19,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        FacadeController dashboard = new FacadeController(new FacadeModel(), primaryStage);
+        DashboardView view = new DashboardView(new FacadeModel(), primaryStage);
     }
 
     /**

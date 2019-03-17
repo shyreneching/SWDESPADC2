@@ -75,11 +75,13 @@ public class DashboardView extends View {
     private ObservableList<Label> listOfPlaylist;
     private FilteredList<SongInterface> filteredData;
 
-    public DashboardView(Stage stage, FacadeModel model, FacadeController controller) {
+    public DashboardView(FacadeModel model, Stage stage) {
         this.stage = stage;
         this.model = model;
-        this.controller = controller;
+        this.controller = new FacadeController(this.model);
+        this.model.attach(this);
         listOfPlaylist = FXCollections.observableArrayList();
+
         try {
             if (model.getUser() == null && model.getAllSong() != null) {
                 filteredData = new FilteredList<>(songView.getSongList(), p -> true);
@@ -410,6 +412,7 @@ public class DashboardView extends View {
     }
 
     private void init() {
+
         songView = new SongListView(model, table, listLabel, stage);
 
         if (LocalDateTime.now().getHour() >= 0 && LocalDateTime.now().getHour() < 12) {

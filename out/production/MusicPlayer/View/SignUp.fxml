@@ -48,8 +48,10 @@
             <Font name="Segoe UI" size="32.0" />
          </font>
       </Label>
-      <Label fx:id="passwordwarn2" alignment="CENTER" layoutX="86.0" layoutY="444.0" prefHeight="0.0" prefWidth="246.0" text="**Passwords do not match**  " textAlignment="JUSTIFY" textFill="#e03753" />
-      <Label fx:id="passwordwarn1" alignment="CENTER" layoutX="86.0" layoutY="382.0" prefHeight="0.0" prefWidth="246.0" text="**Passwords do not match**  " textAlignment="JUSTIFY" textFill="#e03753" />
-      <Label fx:id="usernamewarn" alignment="CENTER" layoutX="84.0" layoutY="321.0" prefHeight="0.0" prefWidth="246.0" text="**Username is already taken**  " textAlignment="JUSTIFY" textFill="#e03753" />
+      <Label fx:id="passwordwarn2" alignment="CENTER" layoutX="76.0" layoutY="444.0" prefHeight="0.0" prefWidth="246.0" text="**Passwords do not match**  " textAlignment="JUSTIFY" textFill="#e03753" />
+      <Label fx:id="passwordwarn1" alignment="CENTER" layoutX="76.0" layoutY="382.0" prefHeight="0.0" prefWidth="246.0" text="**Please input a valid password**  " textAlignment="JUSTIFY" textFill="#e03753" />
+      <Label fx:id="usernamewarn" alignment="CENTER" layoutX="21.0" layoutY="321.0" prefHeight="17.0" prefWidth="356.0" text="**Username is already taken**  " textAlignment="JUSTIFY" textFill="#e03753" />
+      <Label fx:id="required1" alignment="CENTER" layoutX="36.0" layoutY="261.0" prefHeight="17.0" prefWidth="145.0" text="**This field is required**" textAlignment="JUSTIFY" textFill="#e03753" />
+      <Label fx:id="required2" alignment="CENTER" layoutX="215.0" layoutY="261.0" prefHeight="17.0" prefWidth="145.0" text="**This field is required**" textAlignment="JUSTIFY" textFill="#e03753" />
    </children>
 </AnchorPane>

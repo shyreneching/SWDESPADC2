@@ -1,14 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Model;
-
-/**
- *
- * @author Stanley Sie
- */
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,14 +10,30 @@ import java.util.List;
 public class Queue implements PlaylistInterface {
 
     private String playlistid, name;
-    private ObservableList<SongInterface> songs;
-    private List<Integer> trackNo;
+    private ObservableList<SongInterface> songs = FXCollections.observableArrayList();
+    private List<Integer> trackNo = new ArrayList<>();
+    private boolean repeat, shuffle;
 
     public int getNextTrack(int currTrack){
         if (trackNo.indexOf(currTrack) != trackNo.size() - 1)
             return trackNo.get(trackNo.indexOf(currTrack) + 1);
-        else
-            return -1;
+        else {
+            if(repeat == true)
+                return trackNo.get(0);
+            else
+                return -1;
+        }
+    }
+
+    public int getPrevTrack(int currTrack){
+        if (trackNo.indexOf(currTrack) != 0)
+            return trackNo.get(trackNo.indexOf(currTrack) - 1);
+        else{
+            if(repeat == true)
+                return trackNo.get(trackNo.size() - 1);
+            else
+                return -1;
+        }
     }
 
     public void addSong(SongInterface song){
@@ -79,7 +85,20 @@ public class Queue implements PlaylistInterface {
         }
     }
 
+    public boolean isRepeat() {
+        return repeat;
+    }
+
+    public void setRepeat(boolean repeat) {
+        this.repeat = repeat;
+    }
+
+    public boolean isShuffle() {
+        return shuffle;
+    }
+
     public void setShuffle(boolean shuffle) {
+        this.shuffle = shuffle;
         if(shuffle == true){
             Collections.shuffle(trackNo);
         } else {
@@ -87,5 +106,3 @@ public class Queue implements PlaylistInterface {
         }
     }
 }
-
-

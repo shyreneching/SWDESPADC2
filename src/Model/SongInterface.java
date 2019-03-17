@@ -2,7 +2,6 @@ package Model;
 
 import java.io.File;
 import java.sql.Timestamp;
-import javafx.scene.control.Button;
 
 public interface SongInterface {
 
@@ -46,16 +45,7 @@ public interface SongInterface {
     public double getSize();
 
     public void setSize(double size);
-    
-    public String getDuration();
-    
-    public Button getPlay();
-    
-    public Button getEdit();
-    
-    public Button getAdd();
-    
-    public Button getDel();
+
 
     public Timestamp getDate();
 

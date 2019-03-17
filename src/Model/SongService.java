@@ -47,7 +47,7 @@ public class SongService implements Service{
 
             boolean added = statement.execute();
             statement2.execute();
-            
+
             return added;
         } catch (SQLException e){
             e.printStackTrace();
@@ -89,17 +89,14 @@ public class SongService implements Service{
     //gets all the songs in the parameter in an arraylist
     public ObservableList<Object> getAll() throws SQLException {
         Connection connection = pool.checkOut();
-        ObservableList <Object> songs = null;
-        
+        ObservableList <Object> songs = FXCollections.observableArrayList();
+
         String query ="SELECT * FROM song";
         PreparedStatement statement = connection.prepareStatement(query);
 
         try {
 
             ResultSet rs = statement.executeQuery();
-            if(rs.next()) {
-                songs = FXCollections.observableArrayList();
-            }
             while (rs.next()){
                 SongInterface s = new Song();
                 s.setSongid(rs.getString("idsong"));
@@ -314,7 +311,7 @@ public class SongService implements Service{
     public boolean delete(String s){return false;}
 
     //pass the song id to delete the specific song
-    public boolean delete(String songid, Account a) throws SQLException {
+    public boolean delete(String songid, AccountInterface a) throws SQLException {
         Connection connection = pool.checkOut();
         String query = "DELETE FROM usersong " +
                 "WHERE idsong = ? AND username = ?";
@@ -325,11 +322,12 @@ public class SongService implements Service{
         try {
             statement.setString(1, songid);
             statement.setString(2, a.getUsername());
-            for (PlaylistInterface p: a.getPlaylists()) {
-                statement2.setString(1, songid);
-                statement2.setString(2, p.getPlaylistid());
-                statement2.execute();
-            }
+            if(a.getPlaylists() != null)
+                for (PlaylistInterface p: a.getPlaylists()) {
+                    statement2.setString(1, songid);
+                    statement2.setString(2, p.getPlaylistid());
+                    statement2.execute();
+                }
             boolean deleted  = statement.execute();
             return deleted;
         } catch (SQLException e){
