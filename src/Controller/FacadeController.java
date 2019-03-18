@@ -7,6 +7,7 @@ package Controller;
 
 import Model.FacadeModel;
 import View.AddPlaylistView;
+<<<<<<< HEAD
 import View.EditSongView;
 import View.LoginView;
 import View.PlaylistView;
@@ -15,6 +16,12 @@ import View.SignupView;
 import View.SongListView;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
+=======
+import View.DashboardView;
+import View.LoginView;
+import View.ProfileView;
+import View.SignupView;
+>>>>>>> eaf8d0e6ce36a9f59558bf2ae7b03be997a6ac1c
 import javafx.stage.Stage;
 
 /**
@@ -24,21 +31,31 @@ import javafx.stage.Stage;
 public class FacadeController {
     
     private FacadeModel model;
+<<<<<<< HEAD
     private SongListView songView;
     private PlaylistView playlistView;
     
     public FacadeController(FacadeModel model) {
         this.model = model;
     }    
+=======
+    
+    public FacadeController(FacadeModel model) {
+        this.model = model;
+    }
+>>>>>>> eaf8d0e6ce36a9f59558bf2ae7b03be997a6ac1c
     
     public void createPlaylist() {
         AddPlaylistView view = new AddPlaylistView(model);
     }
     
+<<<<<<< HEAD
     public void editSong() {
         EditSongView view = new EditSongView(model);
     }
     
+=======
+>>>>>>> eaf8d0e6ce36a9f59558bf2ae7b03be997a6ac1c
     public void viewProfile() {
         ProfileView view = new ProfileView(model);
     }
@@ -48,6 +65,7 @@ public class FacadeController {
     }
     
     public void login() {
+<<<<<<< HEAD
         LoginView view = new LoginView(model, songView);
     }
     
@@ -65,4 +83,8 @@ public class FacadeController {
     }
     
     
+=======
+        LoginView view = new LoginView(model);
+    }
+>>>>>>> eaf8d0e6ce36a9f59558bf2ae7b03be997a6ac1c
 }

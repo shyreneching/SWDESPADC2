@@ -88,6 +88,17 @@ public class FacadeModel{
         update();
     }
 
+    public void addSong(SongInterface song) {
+        this.songs.add(song);
+        update();
+    }
+
+    public void addingPlaylist(PlaylistInterface p) {
+        this.groups.add(p);
+        update();
+
+    }
+
     //METHOD CONNECTED TO DATABASE
     /*Pass the username and password of the login attempt
     * Compares the username and password if it matches anthing in the database

@@ -12,6 +12,8 @@ public class Queue implements PlaylistInterface {
     private String playlistid, name;
     private ObservableList<SongInterface> songs = FXCollections.observableArrayList();
     private List<Integer> trackNo = new ArrayList<>();
+    private boolean repeat, shuffle;
+
 
     public int getNextTrack(int currTrack, boolean repeat){
         if (trackNo.indexOf(currTrack) != trackNo.size() - 1)
