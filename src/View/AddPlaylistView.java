@@ -15,9 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -37,13 +35,12 @@ public class AddPlaylistView extends View {
     private Button close, create;
     @FXML
     private TextField name;
-    @FXML
-    private RadioButton empty, notempty;
     
-    private ToggleGroup group;
+    private DashboardView view;
     
-    public AddPlaylistView(FacadeModel model) {
+    public AddPlaylistView(FacadeModel model, DashboardView view) {
         this.model = model;
+        this.view = view;
         try {
             loader = new FXMLLoader(getClass().getResource("/View/AddPlaylist.fxml"));
             loader.setController(this);
@@ -56,10 +53,6 @@ public class AddPlaylistView extends View {
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
         } catch (IOException io) { }
-        
-        group = new ToggleGroup();
-        empty.setToggleGroup(group);
-        notempty.setToggleGroup(group);
     }
     
     public void initialize() {
@@ -69,9 +62,6 @@ public class AddPlaylistView extends View {
         create.setOnAction(event -> {
             PlaylistInterface p = new Playlist();
             p.setName(name.getText().trim());
-            if(notempty.isSelected()) {
-                p.setSongs(model.getSongs());
-            }
             
             if(model.getUser() == null) {
                 model.getGroups().add(p);
@@ -80,6 +70,8 @@ public class AddPlaylistView extends View {
                     model.addPlaylist(p);
                 } catch (SQLException ex) { }
             }
+            view.addPlaylist(p);
+            stage.close();
         });
     }
     

@@ -8,14 +8,12 @@ package View;
 import Controller.FacadeController;
 import Controller.MusicPlayerController;
 import Model.FacadeModel;
-import Model.Playlist;
+import Model.PlaylistInterface;
 import Model.SongInterface;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -51,7 +49,7 @@ import javafx.util.Duration;
 public class DashboardView extends View {
 
     @FXML
-    private Button play, close, next, prev, repeat, shuffle, minim, search, profile, list, speaker, login, signup, upload, fw, bw;
+    private Button play, close, next, prev, repeat, shuffle, minim, search, profile, list, speaker, login, signup, upload, fw, bw, saveTitle;
     @FXML
     private Button tracks, albums, artists, genres, years, favMusic, favPlaylist, playlists, createPlaylist, playPlaylist;
     @FXML
@@ -67,7 +65,7 @@ public class DashboardView extends View {
     @FXML
     private TableView table;
     @FXML
-    private TextField searchField;
+    private TextField searchField, changeTitle;
 
     private Stage stage;
     private Scene scene;
@@ -87,7 +85,7 @@ public class DashboardView extends View {
     public DashboardView(FacadeModel model, Stage stage) {
         this.stage = stage;
         this.model = model;
-        this.controller = new FacadeController(this.model);
+        this.controller = new FacadeController(this.model, this);
         this.model.attach(this);
         listOfPlaylist = FXCollections.observableArrayList();
         musicPlayer = new MusicPlayerController(model, this);
@@ -139,7 +137,6 @@ public class DashboardView extends View {
         });
         createPlaylist.setOnAction(event -> {
             controller.createPlaylist();
-            addPlaylist(new Playlist());
         });
         playPlaylist.setOnAction(event -> {
             if (model.getUser() == null) {
@@ -336,19 +333,12 @@ public class DashboardView extends View {
                 if (song != null) {
                     if (row.isHover()) {
                         model.setSelectedSong(song);
-                        if (model.getUser() == null) {
-                            model.getSelectedSong().getAdd().setVisible(true);
-                            model.getSelectedSong().getAdd().setDisable(false);
-                            model.getSelectedSong().getDel().setVisible(true);
-                            model.getSelectedSong().getDel().setDisable(false);
-                        } else {
-                            model.getSelectedSong().getAdd().setVisible(true);
-                            model.getSelectedSong().getAdd().setDisable(false);
-                            model.getSelectedSong().getDel().setVisible(true);
-                            model.getSelectedSong().getDel().setDisable(false);
-                            model.getSelectedSong().getEdit().setVisible(true);
-                            model.getSelectedSong().getEdit().setDisable(false);
-                        }
+                        model.getSelectedSong().getAdd().setVisible(true);
+                        model.getSelectedSong().getAdd().setDisable(false);
+                        model.getSelectedSong().getDel().setVisible(true);
+                        model.getSelectedSong().getDel().setDisable(false);
+                        model.getSelectedSong().getEdit().setVisible(true);
+                        model.getSelectedSong().getEdit().setDisable(false);
                     } else {
                         model.getSelectedSong().getAdd().setVisible(false);
                         model.getSelectedSong().getAdd().setDisable(true);
@@ -359,7 +349,7 @@ public class DashboardView extends View {
                     }
 
                     model.getSelectedSong().getAdd().setOnAction(event -> {
-
+                        controller.addSong();
                     });
                     model.getSelectedSong().getAdd().setOnMouseEntered(event -> {
                         model.getSelectedSong().getAdd().setPrefSize(32, 32);
@@ -382,11 +372,14 @@ public class DashboardView extends View {
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle("Delete Song");
                         alert.setHeaderText("Are you sure you want to delete " + model.getSelectedSong().getName());
-//                        alert.setContentText("Are you sure you want to delete " + model.getSelectedSong().getName());
                         Optional<ButtonType> option = alert.showAndWait();
                         if (option.get() == ButtonType.OK) {
                             if (model.getUser() == null) {
-                                model.removeSongLocally(model.getSelectedSong());
+                                if(listLabel.getText().equalsIgnoreCase("songs")) {
+                                    model.removeSongLocally(model.getSelectedSong());
+                                } else {
+                                    
+                                }
                             } else {
                                 try {
                                     model.deleteSong(model.getSelectedSong().getSongid());
@@ -422,6 +415,11 @@ public class DashboardView extends View {
                 playlistPane.setDisable(true);
             }
         });
+        tracks.setOnAction(event -> {
+            controller.getSongView().showSong();
+            upload.setDisable(false);
+            upload.setVisible(true);
+        });
 //        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
 //            if (filteredData != null) {
 //                filteredData.setPredicate(song -> {
@@ -446,12 +444,25 @@ public class DashboardView extends View {
                 musicPlayer.getCurrentSong().seek(duration.multiply(musicSlider.getValue() / 100));
             }
         });
+        saveTitle.setOnAction(event -> {
+            listLabel.setText(model.getCurrentPlaylist().getName());
+            changeTitle.setVisible(false);
+            changeTitle.setDisable(true);
+            saveTitle.setVisible(false);
+            saveTitle.setDisable(true);
+        });
     }
 
     private void init() {
-        controller.init(model, table, listLabel, stage);
         playPlaylist.setDisable(true);
         playPlaylist.setVisible(false);
+        changeTitle.setVisible(false);
+        changeTitle.setDisable(true);
+        saveTitle.setVisible(false);
+        saveTitle.setDisable(true);
+
+        controller.init(model, table, listLabel, stage, changeTitle, saveTitle);
+        controller.getSongView().showSong();
 
         if (LocalDateTime.now().getHour() >= 0 && LocalDateTime.now().getHour() < 12) {
             if (model.getUser() != null) {
@@ -497,49 +508,53 @@ public class DashboardView extends View {
         playlistVBox.setMaxHeight(Double.MAX_VALUE);
         playlistVBox.setSpacing(20);
 
-        if (model.getUser() != null && model.getUser().getPlaylists() != null) {
-            for (int i = 0; i < model.getUser().getSongs().size(); i++) {
-                Playlist p = new Playlist();
-                p.setName("Playlist" + (i + 1));
-
-                Label label = new Label();
-                label.setText("     " + p.getName());
-                label.setAlignment(Pos.CENTER_LEFT);
-                label.setFont(new Font("Segoe UI", 14));
-                label.setStyle("-fx-text-fill: gray;");
-                label.setPrefWidth(200);
-
-                MenuItem item = new MenuItem("DeletePlaylist");
-                item.setOnAction(event -> {
-                    listOfPlaylist.remove(label);
-                    updatePlaylist();
-                });
-                ContextMenu menu = new ContextMenu();
-                menu.getItems().add(item);
-                label.setContextMenu(menu);
-
-                label.setOnMouseClicked(event -> {
-                    System.out.println(p.getName());
-                });
-                label.setOnMouseEntered(event -> {
-                    label.setStyle("-fx-text-fill: white;");
-                });
-                label.setOnMouseExited(event -> {
+        try {
+            if (model.getUser() != null && model.getUserPlaylist() != null) {
+                for (PlaylistInterface p : model.getUser().getPlaylists()) {
+                    Label label = new Label();
+                    label.setText("     " + p.getName());
+                    label.setAlignment(Pos.CENTER_LEFT);
+                    label.setFont(new Font("Segoe UI", 14));
                     label.setStyle("-fx-text-fill: gray;");
-                });
+                    label.setPrefWidth(200);
 
-                listOfPlaylist.add(label);
-                updatePlaylist();
+                    MenuItem item = new MenuItem("DeletePlaylist");
+                    item.setOnAction(event -> {
+                        listOfPlaylist.remove(label);
+                        updatePlaylist();
+                    });
+                    ContextMenu menu = new ContextMenu();
+                    menu.getItems().add(item);
+                    label.setContextMenu(menu);
+
+                    label.setOnMouseClicked(event -> {
+                        model.setCurrentPlaylist(p);
+                        controller.getSongView().showSong(p);
+                        upload.setDisable(true);
+                        upload.setVisible(false);
+                    });
+                    label.setOnMouseEntered(event -> {
+                        label.setStyle("-fx-text-fill: white;");
+                    });
+                    label.setOnMouseExited(event -> {
+                        label.setStyle("-fx-text-fill: gray;");
+                    });
+
+                    listOfPlaylist.add(label);
+                }
             }
+            updatePlaylist();
+
+        } catch (SQLException ex) {
         }
     }
 
-    public void addPlaylist(Playlist p) {
+    public void addPlaylist(PlaylistInterface p) {
         if (listOfPlaylist.get(0).getText().trim().equalsIgnoreCase("No playlist created")) {
             listOfPlaylist.clear();
         }
 
-        p.setName("NewPlaylist");
+        p.setName(p.getName());
 
         Label label = new Label();
         label.setText("     " + p.getName());
@@ -558,7 +573,10 @@ public class DashboardView extends View {
         label.setContextMenu(menu);
 
         label.setOnMouseClicked(event -> {
-            System.out.println(p.getName());
+            model.setCurrentPlaylist(p);
+            controller.getSongView().showSong(p);
+            upload.setDisable(true);
+            upload.setVisible(false);
         });
         label.setOnMouseEntered(event -> {
             label.setStyle("-fx-text-fill: white;");
@@ -614,6 +632,15 @@ public class DashboardView extends View {
         } catch (SQLException ex) {
         }
         updatePlaylist();
+        
+        if(listLabel.getText().equalsIgnoreCase("songs")) {
+            controller.getSongView().showSong();
+        } else if (listLabel.getText().equalsIgnoreCase("queue")) {
+            controller.getSongView().showQueue();
+        } else {
+            System.out.println(model.getCurrentPlaylist().getSongs().size());
+            controller.getSongView().showSong(model.getCurrentPlaylist());
+        }
 
         if (model.getUser() != null) {
             login.setStyle("-fx-background-image: url('/Files/viewprofile_button.png')");
@@ -661,4 +688,5 @@ public class DashboardView extends View {
     public String getDuration(int time) {
         return String.format("%02d", time / 60) + ":" + String.format("%02d", time % 60);
     }
+    
 }

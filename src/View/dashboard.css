@@ -24,6 +24,16 @@
     -fx-background-color: transparent;
 }
 
+#saveTitle.button {
+    -fx-background-position: center;
+    -fx-background-size: 100%;
+    -fx-background-image: url("/Files/save_button.png");
+}
+
+#saveTitle.button:hover {
+    -fx-background-image: url("/Files/save_button_clicked.png");
+}
+
 #play.button {
     -fx-background-position: center;
     -fx-background-size: 100%;

@@ -1,5 +1,6 @@
 package Model;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Playlist implements PlaylistInterface{
@@ -7,6 +8,10 @@ public class Playlist implements PlaylistInterface{
     private String playlistid, name;
     private ObservableList<SongInterface> songs;
 
+    public Playlist() {
+        songs = FXCollections.observableArrayList();
+    }
+    
     public String getPlaylistid() {
         return playlistid;
     }

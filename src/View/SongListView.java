@@ -6,6 +6,7 @@
 package View;
 
 import Model.FacadeModel;
+import Model.PlaylistInterface;
 import Model.SongInterface;
 import java.io.File;
 import java.sql.SQLException;
@@ -14,9 +15,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -33,14 +36,18 @@ public class SongListView extends View {
     private Label listLabel;
     private TableView table;
     private Stage stage;
+    private TextField changeTitle;
+    private Button saveTitle;
     
     private TableColumn title, album, artist, genre, year, add, del, play, edit, duration;
 
-    public SongListView(FacadeModel model, TableView table, Label listLabel, Stage stage) {
+    public SongListView(FacadeModel model, TableView table, Label listLabel, Stage stage, TextField changeTitle, Button saveTitle) {
         this.model = model;
         this.table = table;
         this.listLabel = listLabel;
         this.stage = stage;
+        this.changeTitle = changeTitle;
+        this.saveTitle = saveTitle;
         songList = FXCollections.observableArrayList();
         this.model.attach(this);
 
@@ -48,8 +55,6 @@ public class SongListView extends View {
     }
 
     private void init() {
-        listLabel.setText("Songs");
-
         try {
             loadSong();
         } catch (SQLException ex) {
@@ -108,14 +113,48 @@ public class SongListView extends View {
         this.songList = songList;
     }
 
+    public void showSong() {
+        changeTitle.setVisible(false);
+        changeTitle.setDisable(true);
+        saveTitle.setVisible(false);
+        saveTitle.setDisable(true);
+        
+        listLabel.setText("Songs");
+        table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
+        table.setItems(songList);
+    }
+    
+    public void showSong(PlaylistInterface playlist) {
+        changeTitle.setVisible(false);
+        changeTitle.setDisable(true);
+        saveTitle.setVisible(false);
+        saveTitle.setDisable(true);
+        
+        listLabel.setText(playlist.getName());
+        listLabel.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 1) {
+                changeTitle.setVisible(true);
+                changeTitle.setDisable(false);
+                saveTitle.setVisible(true);
+                saveTitle.setDisable(false);
+            }
+        });
+        table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
+        table.setItems(playlist.getSongs());
+    }
+    
+    public void showQueue() {
+        listLabel.setText("Queue");
+        table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
+        table.setItems(model.getQueue().getSongs());
+    }
+    
     @Override
     public void update() {
         try {
             loadSong();
         } catch (SQLException ex) {
         }
-        table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
-        table.setItems(songList);
     }
 
     public void updateTable(FilteredList<SongInterface> filteredData) {
