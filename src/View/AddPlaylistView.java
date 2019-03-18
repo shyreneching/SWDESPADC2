@@ -56,6 +56,7 @@ public class AddPlaylistView extends View {
     }
     
     public void initialize() {
+        create.setDefaultButton(true);
         close.setOnAction(event -> {
             stage.close();
         });
@@ -64,13 +65,12 @@ public class AddPlaylistView extends View {
             p.setName(name.getText().trim());
             
             if(model.getUser() == null) {
-                model.getGroups().add(p);
+                model.addPlaylistLocally(p);
             } else {
                 try {
                     model.addPlaylist(p);
                 } catch (SQLException ex) { }
             }
-            view.addPlaylist(p);
             stage.close();
         });
     }

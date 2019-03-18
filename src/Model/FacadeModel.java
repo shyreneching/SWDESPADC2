@@ -25,12 +25,12 @@ public class FacadeModel {
     private ObservableList<PlaylistInterface> groups;
     private SongInterface currentSong, selectedSong;
     private PlaylistInterface currentPlaylist;
+	private PlaylistInterface starred;
 
     private Service accountService;
     private Service playlistService;
     private Service songService;
     private AudioParserInterface parser;
-    private PlaylistInterface queue;
     private ObservableList<View> view;
 
     public FacadeModel() {
@@ -41,7 +41,6 @@ public class FacadeModel {
         playlistService = new PlaylistService();
         songService = new SongService();
         parser = new AudioParser();
-        queue = new Queue();
     }
 
     public void attach(View view) {
@@ -53,7 +52,7 @@ public class FacadeModel {
             v.update();
         }
     }
-
+    
     public PlaylistInterface getCurrentPlaylist() {
         return currentPlaylist;
     }
@@ -144,14 +143,90 @@ public class FacadeModel {
         update();
     }
 
-    public void addPlaylistLocally(PlaylistInterface playist) {
-        
+    public void addPlaylistLocally(PlaylistInterface playlist) {
+        this.groups.add(playlist);
+        update();
     }
     
     public void deletePlaylistLocally(PlaylistInterface playlist) {
-        
+        this.groups.remove(playlist);
+        update();
     }
 
+    public void removeSongFromPlaylist(String playlist, SongInterface song) {
+        for(PlaylistInterface s : groups) {
+            if(s.getName().equalsIgnoreCase(playlist)) {
+                s.getSongs().remove(song);
+            }
+        }
+    }
+	
+	/*initialize the starred playlist to the user in the database*/
+    public boolean createStarred() throws SQLException {
+        ObservableList<Object> playlists = null;
+        playlists = playlistService.getAll();
+		
+		PlaylistInterface p = new Playlist();
+		p.setName("Starred");
+		
+        if (playlists == null) {
+            p.setPlaylistid("P01");
+            if (((PlaylistService) playlistService).add(p, (Account) user)) {
+                user.setPlaylists(getUserPlaylist());
+                update();
+                return true;
+            }
+        } else {
+            p.setPlaylistid(String.format("P%02d", playlists.size() + 1));
+            if (((PlaylistService) playlistService).add(p, (Account) user)) {
+                user.setPlaylists(getUserPlaylist());
+                update();
+                return true;
+            }
+        }
+        update();
+        return false;
+    }
+	
+	/*Adds one specific song to the starred */
+    public boolean starSong(SongInterface s) throws SQLException {
+        ObservableList<PlaylistInterface> playlists = getUserPlaylist();
+		
+		for(PlaylistInterface pp: playlists){
+			if(pp.getPlaylistName().equals("Starred")){
+				PlaylistInterface play = ((PlaylistService) playlistService).getPlaylist(pp.getPlaylistid(), user.getUsername());
+				ObservableList<SongInterface> songs = play.getSongs();
+				if(songs != null){
+					for (SongInterface temp : songs) {
+						if (temp.getSongid().equals(s.getSongid())) {
+							return false;
+						}
+					}
+				}
+				boolean b = ((PlaylistService) playlistService).addSongPlaylist(s, pp.getPlaylistid());
+				user.setPlaylists(getUserPlaylist());
+				update();
+				return b;
+			}
+		}
+		return false;
+    }
+	
+	/*Deletes one specific song in the starred playlist*/
+    public boolean deleteStarred(SongInterface s) throws SQLException {
+		ObservableList<PlaylistInterface> playlists = getUserPlaylist();
+		
+		for(PlaylistInterface pp: playlists){
+			if(pp.getPlaylistName().equals("Starred")){
+				boolean b = ((PlaylistService) playlistService).deleteSongInPlaylist(s.getSongid(), pp.getPlaylistid());
+				user.setPlaylists(getUserPlaylist());
+				update();
+				return b;
+			}
+		}
+		return false; 
+    }
+    
     /*Add/import one song to the database under the current user
     * */
     public boolean addSong(String filelocation) throws SQLException {
@@ -361,13 +436,17 @@ public class FacadeModel {
 
     /*Adds one song to the playlist*/
     public boolean addSongToPlaylist(SongInterface s, PlaylistInterface p) throws SQLException {
-        PlaylistInterface playlist = ((PlaylistService) playlistService).getPlaylist(p.getPlaylistid(), user.getUsername());
+		PlaylistInterface playlist = ((PlaylistService) playlistService).getPlaylist(p.getPlaylistid(), user.getUsername());
         ObservableList<SongInterface> songs = playlist.getSongs();
-        for (SongInterface temp : songs) {
-            if (temp.getSongid().equals(s.getSongid())) {
-                return false;
-            }
-        }
+		
+		if(songs != null){
+			for (SongInterface temp : songs) {
+				if (temp.getSongid().equals(s.getSongid())) {
+					return false;
+				}
+			}
+		}
+		
         boolean b = ((PlaylistService) playlistService).addSongPlaylist(s, p.getPlaylistid());
         user.setPlaylists(getUserPlaylist());
         update();
@@ -465,6 +544,7 @@ public class FacadeModel {
         if (accounts == null) {
             if (accountService.add(a)) {
                 user = (AccountInterface) a;
+				createStarred();
                 return true;
             }
 
@@ -476,25 +556,13 @@ public class FacadeModel {
             }
             if (accountService.add(a)) {
                 user = (AccountInterface) a;
+				createStarred();
                 return true;
             }
         }
         return true;
     }
-
-    public PlaylistInterface getQueue() {
-        return queue;
-    }
-
-    public void setQueue(PlaylistInterface queue) {
-        this.queue = queue;
-    }
-
     //METHOD CONNECTED TO DATABASE
-    public FacadeModel getState() {
-        return this;
-    }
-
     public SongInterface getSelectedSong() {
         return selectedSong;
     }

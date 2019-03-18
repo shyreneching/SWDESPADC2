@@ -10,10 +10,19 @@ import Controller.MusicPlayerController;
 import Model.FacadeModel;
 import Model.PlaylistInterface;
 import Model.SongInterface;
+import Mp3agic.InvalidDataException;
+import Mp3agic.NotSupportedException;
+import Mp3agic.UnsupportedTagException;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -34,9 +43,13 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -140,7 +153,7 @@ public class DashboardView extends View {
         });
         playPlaylist.setOnAction(event -> {
             if (model.getUser() == null) {
-                model.getQueue().setSongs(model.getSongs());
+
                 musicPlayer.playMusic();
             }
         });
@@ -329,56 +342,65 @@ public class DashboardView extends View {
             TableRow<SongInterface> row = new TableRow<>();
             row.hoverProperty().addListener((Observable observable) -> {
                 SongInterface song = row.getItem();
-
                 if (song != null) {
                     if (row.isHover()) {
-                        model.setSelectedSong(song);
-                        model.getSelectedSong().getAdd().setVisible(true);
-                        model.getSelectedSong().getAdd().setDisable(false);
-                        model.getSelectedSong().getDel().setVisible(true);
-                        model.getSelectedSong().getDel().setDisable(false);
-                        model.getSelectedSong().getEdit().setVisible(true);
-                        model.getSelectedSong().getEdit().setDisable(false);
+                        song.getAdd().setVisible(true);
+                        song.getAdd().setDisable(false);
+                        song.getDel().setVisible(true);
+                        song.getDel().setDisable(false);
+                        song.getEdit().setVisible(true);
+                        song.getEdit().setDisable(false);
                     } else {
-                        model.getSelectedSong().getAdd().setVisible(false);
-                        model.getSelectedSong().getAdd().setDisable(true);
-                        model.getSelectedSong().getDel().setVisible(false);
-                        model.getSelectedSong().getDel().setDisable(true);
-                        model.getSelectedSong().getEdit().setVisible(false);
-                        model.getSelectedSong().getEdit().setDisable(true);
+                        song.getAdd().setVisible(false);
+                        song.getAdd().setDisable(true);
+                        song.getDel().setVisible(false);
+                        song.getDel().setDisable(true);
+                        song.getEdit().setVisible(false);
+                        song.getEdit().setDisable(true);
                     }
 
-                    model.getSelectedSong().getAdd().setOnAction(event -> {
+                    song.getAdd().setOnAction(event -> {
+                        model.setSelectedSong(song);
                         controller.addSong();
                     });
-                    model.getSelectedSong().getAdd().setOnMouseEntered(event -> {
-                        model.getSelectedSong().getAdd().setPrefSize(32, 32);
+                    song.getAdd().setOnMouseEntered(event -> {
+                        song.getAdd().setPrefSize(32, 32);
                     });
-                    model.getSelectedSong().getAdd().setOnMouseExited(event -> {
-                        model.getSelectedSong().getAdd().setPrefSize(30, 30);
+                    song.getAdd().setOnMouseExited(event -> {
+                        song.getAdd().setPrefSize(30, 30);
                     });
 
-                    model.getSelectedSong().getEdit().setOnAction(event -> {
+                    song.getEdit().setOnAction(event -> {
+                        model.setSelectedSong(song);
                         controller.editSong();
                     });
-                    model.getSelectedSong().getEdit().setOnMouseEntered(event -> {
-                        model.getSelectedSong().getEdit().setPrefSize(32, 32);
+                    song.getEdit().setOnMouseEntered(event -> {
+                        song.getEdit().setPrefSize(32, 32);
                     });
-                    model.getSelectedSong().getEdit().setOnMouseExited(event -> {
-                        model.getSelectedSong().getEdit().setPrefSize(30, 30);
+                    song.getEdit().setOnMouseExited(event -> {
+                        song.getEdit().setPrefSize(30, 30);
                     });
 
-                    model.getSelectedSong().getDel().setOnAction(event -> {
+                    song.getDel().setOnAction(event -> {
+                        model.setSelectedSong(song);
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle("Delete Song");
                         alert.setHeaderText("Are you sure you want to delete " + model.getSelectedSong().getName());
                         Optional<ButtonType> option = alert.showAndWait();
                         if (option.get() == ButtonType.OK) {
                             if (model.getUser() == null) {
-                                if(listLabel.getText().equalsIgnoreCase("songs")) {
+                                if (listLabel.getText().equalsIgnoreCase("songs")) {
+                                    if(model.getSelectedSong().getName().equalsIgnoreCase(model.getCurrentSong().getName())) {
+                                        model.setCurrentSong(null);
+                                        cover.setImage(new Image(new File("/Files/album_art.png").toURI().toString()));
+                                    }
                                     model.removeSongLocally(model.getSelectedSong());
                                 } else {
-                                    
+                                    if(model.getSelectedSong().getName().equalsIgnoreCase(model.getCurrentSong().getName())) {
+                                        model.setCurrentSong(null);
+                                        cover.setImage(new Image(new File("/Files/album_art.png").toURI().toString()));
+                                    }
+                                    model.removeSongFromPlaylist(listLabel.getText(), song);
                                 }
                             } else {
                                 try {
@@ -389,13 +411,12 @@ public class DashboardView extends View {
                         } else if (option.get() == ButtonType.CANCEL) {
                             event.consume();
                         }
-
                     });
-                    model.getSelectedSong().getDel().setOnMouseEntered(event -> {
-                        model.getSelectedSong().getDel().setPrefSize(32, 32);
+                    song.getDel().setOnMouseEntered(event -> {
+                        song.getDel().setPrefSize(32, 32);
                     });
-                    model.getSelectedSong().getDel().setOnMouseExited(event -> {
-                        model.getSelectedSong().getDel().setPrefSize(30, 30);
+                    song.getDel().setOnMouseExited(event -> {
+                        song.getDel().setPrefSize(30, 30);
                     });
                 }
             });
@@ -407,7 +428,18 @@ public class DashboardView extends View {
 
             if (event.getClickCount() == 2) {
                 model.setCurrentSong((SongInterface) table.getSelectionModel().getSelectedItem());
-
+                try {
+                    cover.setImage(new Image(model.getsongImage(model.getCurrentSong()).toURI().toURL().toString()));
+                } catch (InvalidDataException ex) {
+                    Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (UnsupportedTagException ex) {
+                    Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NotSupportedException ex) {
+                    Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                musicPlayer.setCurrentSong(new MediaPlayer(new Media(model.getCurrentSong().getSongfile().toURI().toString())));
             }
 
             if (playlistPane.isVisible()) {
@@ -508,52 +540,10 @@ public class DashboardView extends View {
         playlistVBox.setMaxHeight(Double.MAX_VALUE);
         playlistVBox.setSpacing(20);
 
-        try {
-            if (model.getUser() != null && model.getUserPlaylist() != null) {
-                for (PlaylistInterface p : model.getUser().getPlaylists()) {
-                    Label label = new Label();
-                    label.setText("     " + p.getName());
-                    label.setAlignment(Pos.CENTER_LEFT);
-                    label.setFont(new Font("Segoe UI", 14));
-                    label.setStyle("-fx-text-fill: gray;");
-                    label.setPrefWidth(200);
-
-                    MenuItem item = new MenuItem("DeletePlaylist");
-                    item.setOnAction(event -> {
-                        listOfPlaylist.remove(label);
-                        updatePlaylist();
-                    });
-                    ContextMenu menu = new ContextMenu();
-                    menu.getItems().add(item);
-                    label.setContextMenu(menu);
-
-                    label.setOnMouseClicked(event -> {
-                        model.setCurrentPlaylist(p);
-                        controller.getSongView().showSong(p);
-                        upload.setDisable(true);
-                        upload.setVisible(false);
-                    });
-                    label.setOnMouseEntered(event -> {
-                        label.setStyle("-fx-text-fill: white;");
-                    });
-                    label.setOnMouseExited(event -> {
-                        label.setStyle("-fx-text-fill: gray;");
-                    });
-
-                    listOfPlaylist.add(label);
-                }
-            }
-            updatePlaylist();
-
-        } catch (SQLException ex) {
-        }
+        updatePlaylist();
     }
 
     public void addPlaylist(PlaylistInterface p) {
-        if (listOfPlaylist.get(0).getText().trim().equalsIgnoreCase("No playlist created")) {
-            listOfPlaylist.clear();
-        }
-
         p.setName(p.getName());
 
         Label label = new Label();
@@ -570,13 +560,37 @@ public class DashboardView extends View {
         });
         ContextMenu menu = new ContextMenu();
         menu.getItems().add(item);
+        menu.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete Song");
+            alert.setHeaderText("Are you sure you want to delete " + p.getName());
+            Optional<ButtonType> option = alert.showAndWait();
+            if (option.get() == ButtonType.OK) {
+                if (model.getUser() == null) {
+                    model.deletePlaylistLocally(p);
+                } else {
+                    try {
+                        if (model.deletePlaylist(p.getPlaylistid())) {
+                            updatePlaylist();
+                        }
+                    } catch (SQLException ex) {
+                    }
+                }
+            } else if (option.get() == ButtonType.CANCEL) {
+                event.consume();
+            }
+        });
         label.setContextMenu(menu);
 
         label.setOnMouseClicked(event -> {
-            model.setCurrentPlaylist(p);
-            controller.getSongView().showSong(p);
-            upload.setDisable(true);
-            upload.setVisible(false);
+            if (event.getButton().equals(MouseButton.PRIMARY)) {
+                model.setCurrentPlaylist(p);
+                controller.getSongView().showSong(p);
+                upload.setDisable(true);
+                upload.setVisible(false);
+            } else if(event.getButton().equals(MouseButton.SECONDARY)) {
+                menu.fireEvent(event);
+            }
         });
         label.setOnMouseEntered(event -> {
             label.setStyle("-fx-text-fill: white;");
@@ -586,12 +600,21 @@ public class DashboardView extends View {
         });
 
         listOfPlaylist.add(label);
-        updatePlaylist();
     }
 
     public void updatePlaylist() {
+        listOfPlaylist.clear();
         playlistVBox.getChildren().clear();
-        if (listOfPlaylist.size() == 0) {
+        if (model.getUser() == null) {
+            for (PlaylistInterface p : model.getGroups()) {
+                addPlaylist(p);
+            }
+        } else {
+            for (PlaylistInterface p : model.getUser().getPlaylists()) {
+                addPlaylist(p);
+            }
+        }
+        if (listOfPlaylist.isEmpty()) {
             Label label = new Label();
             label.setText("     No playlist created");
             label.setAlignment(Pos.CENTER_LEFT);
@@ -625,6 +648,10 @@ public class DashboardView extends View {
             artistName.setText(model.getCurrentSong().getArtist());
             int x = model.getCurrentSong().getLength();
             end.setText(String.format("%02d", x / 60) + ":" + String.format("%02d", x % 60));
+        } else {
+            songName.setText("Song Name");
+            artistName.setText("Artist Name");
+            end.setText("00:00");
         }
 
         try {
@@ -632,13 +659,12 @@ public class DashboardView extends View {
         } catch (SQLException ex) {
         }
         updatePlaylist();
-        
-        if(listLabel.getText().equalsIgnoreCase("songs")) {
+
+        if (listLabel.getText().equalsIgnoreCase("songs")) {
             controller.getSongView().showSong();
         } else if (listLabel.getText().equalsIgnoreCase("queue")) {
             controller.getSongView().showQueue();
         } else {
-            System.out.println(model.getCurrentPlaylist().getSongs().size());
             controller.getSongView().showSong(model.getCurrentPlaylist());
         }
 
@@ -688,5 +714,5 @@ public class DashboardView extends View {
     public String getDuration(int time) {
         return String.format("%02d", time / 60) + ":" + String.format("%02d", time % 60);
     }
-    
+
 }

@@ -45,7 +45,7 @@
             <Button fx:id="prev" contentDisplay="GRAPHIC_ONLY" layoutX="525.0" layoutY="22.0" minHeight="10.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="20.0" />
             <Button fx:id="shuffle" contentDisplay="GRAPHIC_ONLY" layoutX="440.0" layoutY="20.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" />
             <Button fx:id="next" contentDisplay="GRAPHIC_ONLY" layoutX="646.0" layoutY="22.0" minHeight="10.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="20.0" />
-            <Button fx:id="repeat" contentDisplay="GRAPHIC_ONLY" layoutX="733.0" layoutY="13.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" />
+            <Button fx:id="repeat" contentDisplay="GRAPHIC_ONLY" layoutX="727.0" layoutY="13.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" />
             <Slider fx:id="musicSlider" layoutX="385.0" layoutY="59.0" prefHeight="20.0" prefWidth="420.0" />
             <Label fx:id="start" layoutX="348.0" layoutY="61.0" text="00:00" textFill="WHITE">
                <font>
@@ -70,7 +70,7 @@
                   <Font name="Segoe UI Italic" size="16.0" />
                </font>
             </Label>
-            <Button fx:id="fw" contentDisplay="GRAPHIC_ONLY" layoutX="686.0" layoutY="22.0" minHeight="10.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="20.0" />
+            <Button fx:id="fw" contentDisplay="GRAPHIC_ONLY" layoutX="688.0" layoutY="22.0" minHeight="10.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="20.0" />
             <Button fx:id="bw" contentDisplay="GRAPHIC_ONLY" layoutX="486.0" layoutY="22.0" minHeight="10.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="20.0" />
          </children></Pane>
       <Button fx:id="close" contentDisplay="GRAPHIC_ONLY" layoutX="1120.0" layoutY="3.0" maxWidth="25.0" minHeight="23.0" minWidth="23.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="23.0" />

@@ -146,7 +146,7 @@ public class SongListView extends View {
     public void showQueue() {
         listLabel.setText("Queue");
         table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
-        table.setItems(model.getQueue().getSongs());
+        table.setItems(model.getCurrentPlaylist().getSongs());
     }
     
     @Override

@@ -73,13 +73,10 @@ public class AddSongView extends View {
         label.setText("     " + "Add song to queue");
         label.setAlignment(Pos.CENTER_LEFT);
         label.setFont(new Font("Segoe UI", 14));
-        label.setStyle("-fx-text-fill: gray;");
         label.setPrefWidth(200);
 
         label.setOnMouseClicked(event -> {
-            if (!((Queue) model.getQueue()).getSongs().contains(model.getSelectedSong())) {
-                ((Queue) model.getQueue()).addSong(model.getSelectedSong());
-            }
+            
             stage.close();
         });
 
@@ -91,13 +88,10 @@ public class AddSongView extends View {
                 newp.setText("     " + "Add song to " + p.getName());
                 newp.setAlignment(Pos.CENTER_LEFT);
                 newp.setFont(new Font("Segoe UI", 14));
-                newp.setStyle("-fx-text-fill: white;");
                 newp.setPrefWidth(200);
 
                 newp.setOnMouseClicked(event -> {
-                    if (!p.getSongs().contains(model.getSelectedSong())) {
-                        p.getSongs().add(model.getSelectedSong());
-                    }
+                    p.getSongs().add(model.getSelectedSong());
                     stage.close();
                 });
 
@@ -111,7 +105,6 @@ public class AddSongView extends View {
                         newp.setText("     " + "Add song to " + p.getName());
                         newp.setAlignment(Pos.CENTER_LEFT);
                         newp.setFont(new Font("Segoe UI", 14));
-                        newp.setStyle("-fx-text-fill: gray;");
                         newp.setPrefWidth(200);
                         
                         newp.setOnMouseClicked(event -> {
