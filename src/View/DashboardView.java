@@ -143,272 +143,272 @@ public class DashboardView extends View {
             play.setPrefSize(40, 40);
             play.setLayoutX(575);
         });
-        play.setOnAction(event -> {
-            if (controller.musicPlayer.isPause()) {
-                play.setStyle("-fx-background-image: url('/Files/pause.png');");
-            } else {
-                play.setStyle("-fx-background-image: url('/Files/play.png');");
-            }
-            controller.musicPlayer.playMusic();
-        });
-        repeat.setOnMouseEntered(event -> {
-            if (controller.musicPlayer.getRepeat() == 0) {
-                repeat.setStyle("-fx-background-image: url('/Files/repeat_hover.png');");
-            } else if (controller.musicPlayer.getRepeat() == 1) {
-                repeat.setStyle("-fx-background-image: url('/Files/repeat_hover.png');");
-            } else if (controller.musicPlayer.getRepeat() == 2) {
-                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked_hover.png');");
-            }
-
-        });
-        repeat.setOnMouseExited(event -> {
-            if (controller.musicPlayer.getRepeat() == 0) {
-                repeat.setStyle("-fx-background-image: url('/Files/repeat.png');");
-            } else if (controller.musicPlayer.getRepeat() == 1) {
-                repeat.setStyle("-fx-background-image: url('/Files/repeat_clicked.png');");
-            } else if (controller.musicPlayer.getRepeat() == 2) {
-                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked.png');");
-            }
-        });
-        repeat.setOnAction(event -> {
-            if (controller.musicPlayer.getRepeat() == 0) {
-                controller.musicPlayer.setRepeat(1);
-                repeat.setStyle("-fx-background-image: url('/Files/repeat_clicked.png');");
-            } else if (controller.musicPlayer.getRepeat() == 1) {
-                controller.musicPlayer.setRepeat(2);
-                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked.png');");
-            } else if (controller.musicPlayer.getRepeat() == 2) {
-                controller.musicPlayer.setRepeat(0);
-                repeat.setStyle("-fx-background-image: url('/Files/repeat.png');");
-            }
-        });
-        shuffle.setOnMouseEntered(event -> {
-            shuffle.setStyle("-fx-background-image: url('/Files/shuffle_hover.png');");
-        });
-        shuffle.setOnMouseExited(event -> {
-            if (controller.musicPlayer.isShuffle()) {
-                shuffle.setStyle("-fx-background-image: url('/Files/shuffle_clicked.png');");
-            } else {
-                shuffle.setStyle("-fx-background-image: url('/Files/shuffle.png');");
-            }
-        });
-        shuffle.setOnAction(event -> {
-            if (controller.musicPlayer.isShuffle()) {
-                controller.musicPlayer.setShuffle(false);
-                shuffle.setStyle("-fx-background-image: url('/Files/shuffle.png');");
-            } else {
-                controller.musicPlayer.setShuffle(true);
-                shuffle.setStyle("-fx-background-image: url('/Files/shuffle_clicked.png');");
-            }
-        });
-        speaker.setOnMouseEntered(event -> {
-            if (controller.musicPlayer.isMute()) {
-                speaker.setStyle("-fx-background-image: url('/Files/mute_hover.png');");
-            } else {
-                speaker.setStyle("-fx-background-image: url('/Files/volume_hover.png');");
-            }
-        });
-        speaker.setOnMouseExited(event -> {
-            if (controller.musicPlayer.isMute()) {
-                speaker.setStyle("-fx-background-image: url('/Files/mute.png');");
-            } else {
-                speaker.setStyle("-fx-background-image: url('/Files/volume.png');");
-            }
-        });
-        speaker.setOnAction(event -> {
-            if (controller.musicPlayer.isMute()) {
-                controller.musicPlayer.setMute(false);
-                speaker.setStyle("-fx-background-image: url('/Files/volume.png');");
-            } else {
-                controller.musicPlayer.setMute(true);
-                speaker.setStyle("-fx-background-image: url('/Files/mute.png');");
-            }
-        });
-        list.setOnMouseEntered(event -> {
-            list.setStyle("-fx-background-image: url('/Files/list_hover.png');");
-        });
-        list.setOnMouseExited(event -> {
-            list.setStyle("-fx-background-image: url('/Files/list.png');");
-        });
-        login.setOnMouseEntered(event -> {
-            if (model.getUser() != null) {
-                login.setStyle("-fx-background-image: url('/Files/viewprofile_button_clicked.png')");
-            } else {
-                login.setStyle("-fx-background-image: url('/Files/login_button_clicked.png');");
-            }
-        });
-        login.setOnMouseExited(event -> {
-            if (model.getUser() != null) {
-                login.setStyle("-fx-background-image: url('/Files/viewprofile_button.png')");
-            } else {
-                login.setStyle("-fx-background-image: url('/Files/login_button.png');");
-            }
-        });
-        login.setOnAction(event -> {
-            if (model.getUser() == null) {
-                controller.login();
-            } else {
-                controller.viewProfile();
-            }
-        });
-        signup.setOnMouseEntered(event -> {
-            if (model.getUser() != null) {
-                signup.setStyle("-fx-background-image: url('/Files/logout_button_clicked.png')");
-            } else {
-                signup.setStyle("-fx-background-image: url('/Files/signup_button_red-black_clicked.png');");
-            }
-        });
-        signup.setOnMouseExited(event -> {
-            if (model.getUser() != null) {
-                signup.setStyle("-fx-background-image: url('/Files/logout_button.png')");
-            } else {
-                signup.setStyle("-fx-background-image: url('/Files/signup_button_red-black.png');");
-            }
-        });
-        signup.setOnAction(event -> {
-            if (model.getUser() != null) {
-                model.logout();
-            } else {
-                controller.signin();
-            }
-        });
-        close.setOnMouseEntered(event -> {
-            close.setPrefSize(25, 25);
-        });
-        close.setOnMouseExited(event -> {
-            close.setPrefSize(23, 23);
-        });
-        search.setOnMouseEntered(event -> {
-            search.setPrefSize(32, 32);
-        });
-        search.setOnMouseExited(event -> {
-            search.setPrefSize(30, 30);
-        });
-        minim.setOnMouseEntered(event -> {
-            minim.setPrefSize(25, 25);
-        });
-        minim.setOnMouseExited(event -> {
-            minim.setPrefSize(23, 23);
-        });
-        profile.setOnMouseEntered(event -> {
-            profile.setPrefSize(42, 42);
-            profile.setLayoutX(1091);
-        });
-        profile.setOnMouseExited(event -> {
-            profile.setPrefSize(40, 40);
-            profile.setLayoutX(1092);
-        });
-        profile.setOnAction(event -> {
-            if (showProfile) {
-                profilePane.setVisible(false);
-                profilePane.setDisable(true);
-                showProfile = false;
-            } else {
-                profilePane.setVisible(true);
-                profilePane.setDisable(false);
-                showProfile = true;
-            }
-        });
-        minim.setOnAction(event -> {
-            stage.setIconified(true);
-        });
-        close.setOnAction(event -> {
-            System.exit(0);
-            stage.close();
-        });
-        table.setRowFactory(table -> {
-            TableRow<SongInterface> row = new TableRow<>();
-            row.hoverProperty().addListener((Observable observable) -> {
-                SongInterface song = row.getItem();
-
-                if (song != null) {
-                    if (row.isHover()) {
-                        model.setSelectedSong(song);
-                        model.getSelectedSong().getAdd().setVisible(true);
-                        model.getSelectedSong().getEdit().setVisible(true);
-                        model.getSelectedSong().getPlay().setVisible(true);
-                        model.getSelectedSong().getDel().setVisible(true);
-                    } else {
-                        model.getSelectedSong().getAdd().setVisible(false);
-                        model.getSelectedSong().getEdit().setVisible(false);
-                        model.getSelectedSong().getPlay().setVisible(false);
-                        model.getSelectedSong().getDel().setVisible(false);
-                    }
-
-                    model.getSelectedSong().getPlay().setOnAction(event -> {
-                        model.setCurrentSong(model.getSelectedSong());
-                    });
-                    model.getSelectedSong().getPlay().setOnMouseEntered(event -> {
-                        model.getSelectedSong().getPlay().setPrefSize(32, 32);
-                    });
-                    model.getSelectedSong().getPlay().setOnMouseExited(event -> {
-                        model.getSelectedSong().getPlay().setPrefSize(30, 30);
-                    });
-
-                    model.getSelectedSong().getAdd().setOnAction(event -> {
-
-                    });
-                    model.getSelectedSong().getAdd().setOnMouseEntered(event -> {
-                        model.getSelectedSong().getAdd().setPrefSize(32, 32);
-                    });
-                    model.getSelectedSong().getAdd().setOnMouseExited(event -> {
-                        model.getSelectedSong().getAdd().setPrefSize(30, 30);
-                    });
-
-                    model.getSelectedSong().getEdit().setOnAction(event -> {
-
-                    });
-                    model.getSelectedSong().getEdit().setOnMouseEntered(event -> {
-                        model.getSelectedSong().getEdit().setPrefSize(32, 32);
-                    });
-                    model.getSelectedSong().getEdit().setOnMouseExited(event -> {
-                        model.getSelectedSong().getEdit().setPrefSize(30, 30);
-                    });
-                    
-                    model.getSelectedSong().getDel().setOnAction(event -> {
-
-                    });
-                    model.getSelectedSong().getDel().setOnMouseEntered(event -> {
-                        model.getSelectedSong().getDel().setPrefSize(32, 32);
-                    });
-                    model.getSelectedSong().getDel().setOnMouseExited(event -> {
-                        model.getSelectedSong().getDel().setPrefSize(30, 30);
-                    });
-                }
-            });
-
-            return row;
-        });
-        table.setOnMouseClicked(event -> {
-            model.setSelectedSong((SongInterface) table.getSelectionModel().getSelectedItem());
-
-            if (event.getClickCount() == 2) {
-                model.setCurrentSong((SongInterface) table.getSelectionModel().getSelectedItem());
-            }
-
-            if (playlistPane.isVisible()) {
-                playlistPane.setVisible(false);
-                playlistPane.setDisable(true);
-            }
-        });
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (filteredData != null) {
-                filteredData.setPredicate(song -> {
-                    if (newValue == null || newValue.isEmpty()) {
-                        return true;
-                    }
-
-                    String filter = newValue.toLowerCase();
-                    if (song.getName().toLowerCase().contains(filter)) {
-                        return true;
-                    }
-
-                    return false;
-                });
-
-                songView.updateTable(filteredData);
-            }
-        });
+//        play.setOnAction(event -> {
+//            if (controller.musicPlayer.isPause()) {
+//                play.setStyle("-fx-background-image: url('/Files/pause.png');");
+//            } else {
+//                play.setStyle("-fx-background-image: url('/Files/play.png');");
+//            }
+//            controller.musicPlayer.playMusic();
+//        });
+//        repeat.setOnMouseEntered(event -> {
+//            if (controller.musicPlayer.getRepeat() == 0) {
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat_hover.png');");
+//            } else if (controller.musicPlayer.getRepeat() == 1) {
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat_hover.png');");
+//            } else if (controller.musicPlayer.getRepeat() == 2) {
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked_hover.png');");
+//            }
+//
+//        });
+//        repeat.setOnMouseExited(event -> {
+//            if (controller.musicPlayer.getRepeat() == 0) {
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat.png');");
+//            } else if (controller.musicPlayer.getRepeat() == 1) {
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat_clicked.png');");
+//            } else if (controller.musicPlayer.getRepeat() == 2) {
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked.png');");
+//            }
+//        });
+//        repeat.setOnAction(event -> {
+//            if (controller.musicPlayer.getRepeat() == 0) {
+//                controller.musicPlayer.setRepeat(1);
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat_clicked.png');");
+//            } else if (controller.musicPlayer.getRepeat() == 1) {
+//                controller.musicPlayer.setRepeat(2);
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked.png');");
+//            } else if (controller.musicPlayer.getRepeat() == 2) {
+//                controller.musicPlayer.setRepeat(0);
+//                repeat.setStyle("-fx-background-image: url('/Files/repeat.png');");
+//            }
+//        });
+//        shuffle.setOnMouseEntered(event -> {
+//            shuffle.setStyle("-fx-background-image: url('/Files/shuffle_hover.png');");
+//        });
+//        shuffle.setOnMouseExited(event -> {
+//            if (controller.musicPlayer.isShuffle()) {
+//                shuffle.setStyle("-fx-background-image: url('/Files/shuffle_clicked.png');");
+//            } else {
+//                shuffle.setStyle("-fx-background-image: url('/Files/shuffle.png');");
+//            }
+//        });
+//        shuffle.setOnAction(event -> {
+//            if (controller.musicPlayer.isShuffle()) {
+//                controller.musicPlayer.setShuffle(false);
+//                shuffle.setStyle("-fx-background-image: url('/Files/shuffle.png');");
+//            } else {
+//                controller.musicPlayer.setShuffle(true);
+//                shuffle.setStyle("-fx-background-image: url('/Files/shuffle_clicked.png');");
+//            }
+//        });
+//        speaker.setOnMouseEntered(event -> {
+//            if (controller.musicPlayer.isMute()) {
+//                speaker.setStyle("-fx-background-image: url('/Files/mute_hover.png');");
+//            } else {
+//                speaker.setStyle("-fx-background-image: url('/Files/volume_hover.png');");
+//            }
+//        });
+//        speaker.setOnMouseExited(event -> {
+//            if (controller.musicPlayer.isMute()) {
+//                speaker.setStyle("-fx-background-image: url('/Files/mute.png');");
+//            } else {
+//                speaker.setStyle("-fx-background-image: url('/Files/volume.png');");
+//            }
+//        });
+//        speaker.setOnAction(event -> {
+//            if (controller.musicPlayer.isMute()) {
+//                controller.musicPlayer.setMute(false);
+//                speaker.setStyle("-fx-background-image: url('/Files/volume.png');");
+//            } else {
+//                controller.musicPlayer.setMute(true);
+//                speaker.setStyle("-fx-background-image: url('/Files/mute.png');");
+//            }
+//        });
+//        list.setOnMouseEntered(event -> {
+//            list.setStyle("-fx-background-image: url('/Files/list_hover.png');");
+//        });
+//        list.setOnMouseExited(event -> {
+//            list.setStyle("-fx-background-image: url('/Files/list.png');");
+//        });
+//        login.setOnMouseEntered(event -> {
+//            if (model.getUser() != null) {
+//                login.setStyle("-fx-background-image: url('/Files/viewprofile_button_clicked.png')");
+//            } else {
+//                login.setStyle("-fx-background-image: url('/Files/login_button_clicked.png');");
+//            }
+//        });
+//        login.setOnMouseExited(event -> {
+//            if (model.getUser() != null) {
+//                login.setStyle("-fx-background-image: url('/Files/viewprofile_button.png')");
+//            } else {
+//                login.setStyle("-fx-background-image: url('/Files/login_button.png');");
+//            }
+//        });
+//        login.setOnAction(event -> {
+//            if (model.getUser() == null) {
+//                controller.login();
+//            } else {
+//                controller.viewProfile();
+//            }
+//        });
+//        signup.setOnMouseEntered(event -> {
+//            if (model.getUser() != null) {
+//                signup.setStyle("-fx-background-image: url('/Files/logout_button_clicked.png')");
+//            } else {
+//                signup.setStyle("-fx-background-image: url('/Files/signup_button_red-black_clicked.png');");
+//            }
+//        });
+//        signup.setOnMouseExited(event -> {
+//            if (model.getUser() != null) {
+//                signup.setStyle("-fx-background-image: url('/Files/logout_button.png')");
+//            } else {
+//                signup.setStyle("-fx-background-image: url('/Files/signup_button_red-black.png');");
+//            }
+//        });
+//        signup.setOnAction(event -> {
+//            if (model.getUser() != null) {
+//                model.logout();
+//            } else {
+//                controller.signin();
+//            }
+//        });
+//        close.setOnMouseEntered(event -> {
+//            close.setPrefSize(25, 25);
+//        });
+//        close.setOnMouseExited(event -> {
+//            close.setPrefSize(23, 23);
+//        });
+//        search.setOnMouseEntered(event -> {
+//            search.setPrefSize(32, 32);
+//        });
+//        search.setOnMouseExited(event -> {
+//            search.setPrefSize(30, 30);
+//        });
+//        minim.setOnMouseEntered(event -> {
+//            minim.setPrefSize(25, 25);
+//        });
+//        minim.setOnMouseExited(event -> {
+//            minim.setPrefSize(23, 23);
+//        });
+//        profile.setOnMouseEntered(event -> {
+//            profile.setPrefSize(42, 42);
+//            profile.setLayoutX(1091);
+//        });
+//        profile.setOnMouseExited(event -> {
+//            profile.setPrefSize(40, 40);
+//            profile.setLayoutX(1092);
+//        });
+//        profile.setOnAction(event -> {
+//            if (showProfile) {
+//                profilePane.setVisible(false);
+//                profilePane.setDisable(true);
+//                showProfile = false;
+//            } else {
+//                profilePane.setVisible(true);
+//                profilePane.setDisable(false);
+//                showProfile = true;
+//            }
+//        });
+//        minim.setOnAction(event -> {
+//            stage.setIconified(true);
+//        });
+//        close.setOnAction(event -> {
+//            System.exit(0);
+//            stage.close();
+//        });
+//        table.setRowFactory(table -> {
+//            TableRow<SongInterface> row = new TableRow<>();
+//            row.hoverProperty().addListener((Observable observable) -> {
+//                SongInterface song = row.getItem();
+//
+//                if (song != null) {
+//                    if (row.isHover()) {
+//                        model.setSelectedSong(song);
+//                        model.getSelectedSong().getAdd().setVisible(true);
+//                        model.getSelectedSong().getEdit().setVisible(true);
+//                        model.getSelectedSong().getPlay().setVisible(true);
+//                        model.getSelectedSong().getDel().setVisible(true);
+//                    } else {
+//                        model.getSelectedSong().getAdd().setVisible(false);
+//                        model.getSelectedSong().getEdit().setVisible(false);
+//                        model.getSelectedSong().getPlay().setVisible(false);
+//                        model.getSelectedSong().getDel().setVisible(false);
+//                    }
+//
+//                    model.getSelectedSong().getPlay().setOnAction(event -> {
+//                        model.setCurrentSong(model.getSelectedSong());
+//                    });
+//                    model.getSelectedSong().getPlay().setOnMouseEntered(event -> {
+//                        model.getSelectedSong().getPlay().setPrefSize(32, 32);
+//                    });
+//                    model.getSelectedSong().getPlay().setOnMouseExited(event -> {
+//                        model.getSelectedSong().getPlay().setPrefSize(30, 30);
+//                    });
+//
+//                    model.getSelectedSong().getAdd().setOnAction(event -> {
+//
+//                    });
+//                    model.getSelectedSong().getAdd().setOnMouseEntered(event -> {
+//                        model.getSelectedSong().getAdd().setPrefSize(32, 32);
+//                    });
+//                    model.getSelectedSong().getAdd().setOnMouseExited(event -> {
+//                        model.getSelectedSong().getAdd().setPrefSize(30, 30);
+//                    });
+//
+//                    model.getSelectedSong().getEdit().setOnAction(event -> {
+//
+//                    });
+//                    model.getSelectedSong().getEdit().setOnMouseEntered(event -> {
+//                        model.getSelectedSong().getEdit().setPrefSize(32, 32);
+//                    });
+//                    model.getSelectedSong().getEdit().setOnMouseExited(event -> {
+//                        model.getSelectedSong().getEdit().setPrefSize(30, 30);
+//                    });
+//
+//                    model.getSelectedSong().getDel().setOnAction(event -> {
+//
+//                    });
+//                    model.getSelectedSong().getDel().setOnMouseEntered(event -> {
+//                        model.getSelectedSong().getDel().setPrefSize(32, 32);
+//                    });
+//                    model.getSelectedSong().getDel().setOnMouseExited(event -> {
+//                        model.getSelectedSong().getDel().setPrefSize(30, 30);
+//                    });
+//                }
+//            });
+//
+//            return row;
+//        });
+//        table.setOnMouseClicked(event -> {
+//            model.setSelectedSong((SongInterface) table.getSelectionModel().getSelectedItem());
+//
+//            if (event.getClickCount() == 2) {
+//                model.setCurrentSong((SongInterface) table.getSelectionModel().getSelectedItem());
+//            }
+//
+//            if (playlistPane.isVisible()) {
+//                playlistPane.setVisible(false);
+//                playlistPane.setDisable(true);
+//            }
+//        });
+//        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+//            if (filteredData != null) {
+//                filteredData.setPredicate(song -> {
+//                    if (newValue == null || newValue.isEmpty()) {
+//                        return true;
+//                    }
+//
+//                    String filter = newValue.toLowerCase();
+//                    if (song.getName().toLowerCase().contains(filter)) {
+//                        return true;
+//                    }
+//
+//                    return false;
+//                });
+//
+//                songView.updateTable(filteredData);
+//            }
+//        });
     }
 
     private void init() {

@@ -419,7 +419,7 @@ public class FacadeModel{
     }
 
     /*Edits the name of the user*/
-    public boolean updateNameofUser(String name, Account a) throws SQLException {
+    public boolean updateNameofUser(String name, AccountInterface a) throws SQLException {
         a.setName(name);
         boolean b = accountService.update(a.getUsername(), a);
         update();
@@ -427,7 +427,7 @@ public class FacadeModel{
     }
 
     /*Edits the password of the user*/
-    public boolean updateUserPassword(String password, Account a) throws SQLException {
+    public boolean updateUserPassword(String password, AccountInterface a) throws SQLException {
         a.setPassword(password);
         boolean b = accountService.update(a.getUsername(), a);
         update();

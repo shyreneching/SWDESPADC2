@@ -326,7 +326,7 @@ public class AudioParser implements AudioParserInterface{
     }*/
 
     public static void main(String args[]) throws SQLException {
-        String filelocation = "src/Music/Echosmith - Bright.mp3";
+        /*String filelocation = "src/Music/Echosmith - Bright.mp3";
         SongInterface song = CreateSongFromLocal.CreateSong(filelocation);
         song.setSongid("S01");
         song.setUser("User");
@@ -353,6 +353,9 @@ public class AudioParser implements AudioParserInterface{
         while (true){
             if(mp3Player.isStopped())
                 break;
-        }
+        }*/
+        FacadeModel model = new FacadeModel();
+        model.login("User","password");
+        System.out.println(model.getUser().getName());
     }
 }
