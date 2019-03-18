@@ -10,47 +10,47 @@ package Model;
 import Mp3agic.InvalidDataException;
 import Mp3agic.NotSupportedException;
 import Mp3agic.UnsupportedTagException;
+import View.View;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInput;
 import java.sql.SQLException;
 
 public class FacadeModel{
     private AccountInterface user;
     private ObservableList<SongInterface> songs;
     private ObservableList<PlaylistInterface> groups;
-    private SongInterface currentSong;
+    private SongInterface currentSong, selectedSong;
 
     private Service accountService;
     private Service playlistService;
     private Service songService;
     private AudioParserInterface parser;
+    private PlaylistInterface queue;
+    private ObservableList<View> view;
 
     public FacadeModel() {
         songs = FXCollections.observableArrayList();
         groups = FXCollections.observableArrayList();
+        view = FXCollections.observableArrayList();
         accountService = new AccountService();
         playlistService = new PlaylistService();
         songService = new SongService();
         parser = new AudioParser();
+        queue = new Queue();
     }
-    /*
-    public FacadeModel(DashboardView view) {
-        super.attach(view);
-    }
-*/
-    /*private View view;
 
     public void attach(View view) {
-        this.view = view;
+        this.view.add(view);
     }
 
     public void update() {
-        view.update();
-    }*/
+        for(View v: view) {
+            v.update();
+        }
+    }
 
     public SongInterface getCurrentSong() {
         return currentSong;
@@ -58,7 +58,7 @@ public class FacadeModel{
 
     public void setCurrentSong(SongInterface currentSong) {
         this.currentSong = currentSong;
-        //update();
+        update();
     }
     
     public AccountInterface getUser() {
@@ -67,7 +67,7 @@ public class FacadeModel{
 
     public void setUser(AccountInterface user) {
         this.user = user;
-        //update();
+        update();
     }
 
     public ObservableList<SongInterface> getSongs() {
@@ -76,7 +76,7 @@ public class FacadeModel{
 
     public void setSongs(ObservableList<SongInterface> songs) {
         this.songs = songs;
-        //update();
+        update();
     }
 
     public ObservableList<PlaylistInterface> getGroups() {
@@ -85,7 +85,7 @@ public class FacadeModel{
 
     public void setGroups(ObservableList<PlaylistInterface> groups) {
         this.groups = groups;
-        //update();
+        update();
     }
 
     //METHOD CONNECTED TO DATABASE
@@ -98,9 +98,10 @@ public class FacadeModel{
         if (accounts != null){
             for (Object temp : accounts) {
                 if (((Account)temp).getUsername().compareTo(username) == 0 && ((Account)temp).getPassword().compareTo(password) == 0){
-                    user = (Account) temp;
+                    user = (AccountInterface) temp;
                     user.setPlaylists(getUserPlaylist());
                     user.setSongs(getUserSongs());
+                    update();
                     return true;
                 }
             }
@@ -110,15 +111,25 @@ public class FacadeModel{
 
     public void logout(){
         user = null;
-        //update();
+        update();
     }
 
     public void addSongLocally(String filelocation){
         if(songs == null)
             songs = FXCollections.observableArrayList();
         songs.add(CreateSongFromLocal.CreateSong(filelocation));
+        update();
     }
 
+    public void removeSongLocally(SongInterface song) {
+        System.out.println(songs == null);
+        if(songs != null) {
+            songs.remove(song);
+            System.out.println("song removed");
+        }
+        update();
+    }
+    
     /*Add/import one song to the database under the current user
     * */
     public boolean addSong(String filelocation) throws SQLException {
@@ -127,7 +138,7 @@ public class FacadeModel{
         SongInterface s = CreateSongFromLocal.CreateSong(filelocation);
         s.setUser(this.user.getUsername());
 
-        if (songs == null) {
+        if (songs.size() == 0) {
             s.setSongid("S01");
             if(songService.add(s)){
                 user.setSongs(getUserSongs());
@@ -135,24 +146,25 @@ public class FacadeModel{
             }
         } else {
             for (Object temp : songs) {
-                if (((Song) temp).getName().compareToIgnoreCase(s.getName()) != 0
-                        && ((Song) temp).getArtist().compareToIgnoreCase(s.getArtist()) != 0
-                        && ((Song) temp).getAlbum().compareToIgnoreCase(s.getAlbum()) != 0) {
+                if (((SongInterface) temp).getName().compareToIgnoreCase(s.getName()) != 0
+                        && ((SongInterface) temp).getArtist().compareToIgnoreCase(s.getArtist()) != 0
+                        && ((SongInterface) temp).getAlbum().compareToIgnoreCase(s.getAlbum()) != 0) {
                     s.setSongid(String.format("S%02d", songs.size() + 1));
                     if (songService.add(s)) {
                         user.setSongs(getUserSongs());
-                        //update();
+                        update();
                         return true;
                     }
                 }else{
-                    boolean b = ((SongService)songService).addSongtoUser(((Song) temp).getSongid(), user.getUsername());
+                    boolean b = ((SongService)songService).addSongtoUser(((SongInterface) temp).getSongid(), user.getUsername());
+                    System.out.println(b);
                     user.setSongs(getUserSongs());
-                    //update();
+                    update();
                     return b;
                 }
             }
         }
-        //update();
+        update();
         return false;
     }
 
@@ -163,9 +175,9 @@ public class FacadeModel{
     /*Deletes one specific song in the database using songid
     * Automatically deletes the song in the playlist that contains the song*/
     public boolean deleteSong(String songid) throws SQLException {
-        boolean b =((SongService)songService).delete(songid, user);
+        boolean b =((SongService)songService).delete(songid, (AccountInterface) user);
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -176,7 +188,7 @@ public class FacadeModel{
         parser.editSongDetails(old, s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -187,7 +199,7 @@ public class FacadeModel{
         parser.editSongDetails(old, s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -198,7 +210,7 @@ public class FacadeModel{
         parser.editSongDetails(old, s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -209,7 +221,7 @@ public class FacadeModel{
         parser.editSongDetails(old, s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -220,7 +232,7 @@ public class FacadeModel{
         parser.editSongDetails(old, s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -231,7 +243,7 @@ public class FacadeModel{
         parser.editSongDetails(old, s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -242,7 +254,7 @@ public class FacadeModel{
         parser.editSongDetails(old, s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -251,7 +263,7 @@ public class FacadeModel{
         s.setFilename(filename);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -260,7 +272,7 @@ public class FacadeModel{
         s.setFilename(filelocation);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
@@ -275,14 +287,14 @@ public class FacadeModel{
         setCurrentSong(s);
         boolean b = ((SongService)songService).update(s.getSongid(), s, s.getUser());
         user.setSongs(getUserSongs());
-        //update();
+        update();
         return b;
     }
 
     /*Returns all the songs in the database*/
     public ObservableList<SongInterface> getAllSong() throws SQLException {
         ObservableList<Object> o = songService.getAll();
-        ObservableList<SongInterface> songs = null;
+        ObservableList<SongInterface> songs = FXCollections.observableArrayList();
         if(o != null) {
             for (Object temp : o) {
                 songs.add((SongInterface)temp);
@@ -308,20 +320,20 @@ public class FacadeModel{
 
         if (playlists == null) {
             p.setPlaylistid("P01");
-            if(((PlaylistService)playlistService).add(p, user)){
+            if(((PlaylistService)playlistService).add(p, (Account)user)){
                 user.setPlaylists(getUserPlaylist());
-                //update();
+                update();
                 return true;
             }
         } else {
             p.setPlaylistid(String.format("P%02d", playlists.size() + 1));
-            if(((PlaylistService)playlistService).add(p, user)){
+            if(((PlaylistService)playlistService).add(p, (Account)user)){
                 user.setPlaylists(getUserPlaylist());
-                //update();
+                update();
                 return true;
             }
         }
-        //update();
+        update();
         return false;
     }
 
@@ -335,7 +347,7 @@ public class FacadeModel{
         }
         boolean b = ((PlaylistService)playlistService).addSongPlaylist(s, p.getPlaylistid());
         user.setPlaylists(getUserPlaylist());
-        //update();
+        update();
         return b;
     }
 
@@ -343,7 +355,7 @@ public class FacadeModel{
     public boolean deleteSongToPlaylist(SongInterface s, PlaylistInterface p) throws SQLException {
         boolean b = ((PlaylistService)playlistService).deleteSongInPlaylist(s.getSongid(), p.getPlaylistid());
         user.setPlaylists(getUserPlaylist());
-        //update();
+        update();
         return b;
     }
 
@@ -392,7 +404,7 @@ public class FacadeModel{
     public boolean deletePlaylist(String playlistid) throws SQLException {
         boolean b = playlistService.delete(playlistid);
         user.setPlaylists(getUserPlaylist());
-        //update();
+        update();
         return b;
     }
 
@@ -401,23 +413,23 @@ public class FacadeModel{
         p.setName(playlistname);
         boolean b = playlistService.update(p.getPlaylistid(), p);
         user.setPlaylists(getUserPlaylist());
-        //update();
+        update();
         return b;
     }
 
     /*Edits the name of the user*/
-    public boolean updateNameofUser(String name, Account a) throws SQLException {
+    public boolean updateNameofUser(String name, AccountInterface a) throws SQLException {
         a.setName(name);
         boolean b = accountService.update(a.getUsername(), a);
-        //update();
+        update();
         return b;
     }
 
     /*Edits the password of the user*/
-    public boolean updateUserPassword(String password, Account a) throws SQLException {
+    public boolean updateUserPassword(String password, AccountInterface a) throws SQLException {
         a.setPassword(password);
         boolean b = accountService.update(a.getUsername(), a);
-        //update();
+        update();
         return b;
     }
 
@@ -429,7 +441,7 @@ public class FacadeModel{
 
         if (accounts == null) {
             if(accountService.add(a)){
-                user = a;
+                user = (AccountInterface) a;
                 return true;
             }
 
@@ -439,16 +451,33 @@ public class FacadeModel{
                     return false;
             }
             if(accountService.add(a)){
-                user = a;
+                user = (AccountInterface) a;
                 return true;
             }
         }
         return true;
     }
-    
+
+    public PlaylistInterface getQueue() {
+        return queue;
+    }
+
+    public void setQueue(PlaylistInterface queue) {
+        this.queue = queue;
+    }
+
     //METHOD CONNECTED TO DATABASE
     
     public FacadeModel getState() {
         return this;
     }
+
+    public SongInterface getSelectedSong() {
+        return selectedSong;
+    }
+
+    public void setSelectedSong(SongInterface selectedSong) {
+        this.selectedSong = selectedSong;
+    }
+
 }

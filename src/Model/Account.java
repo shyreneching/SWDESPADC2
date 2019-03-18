@@ -10,8 +10,7 @@ public class Account implements AccountInterface {
     private ObservableList<SongInterface> songs;
 
     public Account(){
-        playlists = FXCollections.observableArrayList();
-        songs = FXCollections.observableArrayList();
+
     }
 
     public Account(String name, String username, String password) {
@@ -43,7 +42,7 @@ public class Account implements AccountInterface {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name + " ";
     }
 
     public ObservableList<PlaylistInterface> getPlaylists() {

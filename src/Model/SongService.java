@@ -45,10 +45,10 @@ public class SongService implements Service{
             statement2.setString(2, s.getUser());
             statement2.setInt(3, s.getTimesplayed());
 
-            boolean added = statement.execute();
+            statement.execute();
             statement2.execute();
-
-            return added;
+            
+            return true;
         } catch (SQLException e){
             e.printStackTrace();
         } catch (FileNotFoundException e) {
@@ -62,7 +62,7 @@ public class SongService implements Service{
     }
 
     //adds existing song to user
-    public boolean addSongtoUser(String songid, String username) throws SQLException {
+    public boolean addSongtoUser(String songid, String username) throws SQLException, SQLIntegrityConstraintViolationException {
         Connection connection = pool.checkOut();
 
         String query = "INSERT INTO usersong VALUE (?, ?, ?)";
@@ -77,7 +77,7 @@ public class SongService implements Service{
 
             return added;
         } catch (SQLException e){
-            e.printStackTrace();
+            
         } finally {
             if(statement != null) statement.close();
             if(connection != null)  connection.close();
@@ -90,7 +90,7 @@ public class SongService implements Service{
     public ObservableList<Object> getAll() throws SQLException {
         Connection connection = pool.checkOut();
         ObservableList <Object> songs = FXCollections.observableArrayList();
-
+        
         String query ="SELECT * FROM song";
         PreparedStatement statement = connection.prepareStatement(query);
 
@@ -161,7 +161,6 @@ public class SongService implements Service{
                 s.setYear(rs.getInt("year"));
                 s.setTrackNumber(rs.getInt("trackNumber"));
                 s.setLength(rs.getInt("length"));
-                s.setSize(rs.getFloat("size"));
                 s.setSize(rs.getFloat("size"));
                 // sets the name to "Artist-title"
                 s.setFilename("src/Music/" + s.getArtist() + "-"+ s.getName()+ ".mp3");
@@ -322,12 +321,13 @@ public class SongService implements Service{
         try {
             statement.setString(1, songid);
             statement.setString(2, a.getUsername());
-            if(a.getPlaylists() != null)
+            if(a.getPlaylists() != null) {
                 for (PlaylistInterface p: a.getPlaylists()) {
-                    statement2.setString(1, songid);
-                    statement2.setString(2, p.getPlaylistid());
-                    statement2.execute();
-                }
+                statement2.setString(1, songid);
+                statement2.setString(2, p.getPlaylistid());
+                statement2.execute();
+            }
+            }
             boolean deleted  = statement.execute();
             return deleted;
         } catch (SQLException e){
@@ -355,11 +355,11 @@ public class SongService implements Service{
                 + "trackNumber = ?, "
                 + "length = ?, "
                 + "size = ?, "
-                + "songfile = ?, "
-                + " WHERE songid = ?";
+                + "songfile = ? "
+                + " WHERE idsong = ?";
 
         String query2 = "UPDATE usersong SET "
-                + "timesplayed = ?, "
+                + "timesplayed = ? "
                 + " WHERE username= ?";
         PreparedStatement statement = connection.prepareStatement(query);
         PreparedStatement statement2 = connection.prepareStatement(query2);

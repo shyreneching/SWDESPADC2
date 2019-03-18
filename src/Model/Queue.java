@@ -10,11 +10,10 @@ import java.util.List;
 public class Queue implements PlaylistInterface {
 
     private String playlistid, name;
-    private ObservableList<SongInterface> songs;
-    private List<Integer> trackNo;
-    private boolean repeat, shuffle;
+    private ObservableList<SongInterface> songs = FXCollections.observableArrayList();
+    private List<Integer> trackNo = new ArrayList<>();
 
-    public int getNextTrack(int currTrack){
+    public int getNextTrack(int currTrack, boolean repeat){
         if (trackNo.indexOf(currTrack) != trackNo.size() - 1)
             return trackNo.get(trackNo.indexOf(currTrack) + 1);
         else {
@@ -25,7 +24,7 @@ public class Queue implements PlaylistInterface {
         }
     }
 
-    public int getPrevTrack(int currTrack){
+    public int getPrevTrack(int currTrack, boolean repeat){
         if (trackNo.indexOf(currTrack) != 0)
             return trackNo.get(trackNo.indexOf(currTrack) - 1);
         else{
@@ -85,20 +84,7 @@ public class Queue implements PlaylistInterface {
         }
     }
 
-    public boolean isRepeat() {
-        return repeat;
-    }
-
-    public void setRepeat(boolean repeat) {
-        this.repeat = repeat;
-    }
-
-    public boolean isShuffle() {
-        return shuffle;
-    }
-
     public void setShuffle(boolean shuffle) {
-        this.shuffle = shuffle;
         if(shuffle == true){
             Collections.shuffle(trackNo);
         } else {

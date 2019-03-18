@@ -5,155 +5,660 @@
  */
 package View;
 
-import Controller.DashboardController;
-import Model.Dashboard;
-import Model.Song;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import Controller.FacadeController;
+import Controller.MusicPlayerController;
+import Model.FacadeModel;
+import Model.Playlist;
+import Model.SongInterface;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 /**
  *
  * @author Stanley Sie
  */
 public class DashboardView extends View {
-    
-    private Dashboard model;
-    
+
     @FXML
-    private Button search, tracks, starred, musicPlayer, newPlaylist, profile, edit, delete, upload;
+    private Button play, close, next, prev, repeat, shuffle, minim, search, profile, list, speaker, login, signup, upload, fw, bw;
     @FXML
-    private VBox playlistList;
+    private Button tracks, albums, artists, genres, years, favMusic, favPlaylist, playlists, createPlaylist, playPlaylist;
     @FXML
-    private TextField searchField;
+    private Slider musicSlider, speakerSlider;
+    @FXML
+    private VBox playlistVBox;
+    @FXML
+    private AnchorPane profilePane, playlistPane;
+    @FXML
+    private ImageView cover, lookPlaylist;
+    @FXML
+    private Label greetings, or, start, end, songName, artistName, listLabel;
     @FXML
     private TableView table;
     @FXML
-    private ScrollPane scroll;
-    @FXML
-    private Label songName, artistName;
-    
-    private FXMLLoader loader;
+    private TextField searchField;
+
     private Stage stage;
     private Scene scene;
+    private FXMLLoader loader;
     private Parent root;
-    
-    public DashboardView(DashboardController controller, Dashboard model, Stage stage) {
-        super(controller);
-        this.model = model;
+
+    private FacadeModel model;
+    private FacadeController controller;
+    private MusicPlayerController musicPlayer;
+    private SongListView songView;
+    private PlaylistView playlistView;
+    private boolean showProfile;
+
+    private ObservableList<Label> listOfPlaylist;
+    private FilteredList<SongInterface> filteredData;
+
+    public DashboardView(FacadeModel model, Stage stage) {
         this.stage = stage;
-        
+        this.model = model;
+        this.controller = new FacadeController(this.model);
+        this.model.attach(this);
+        listOfPlaylist = FXCollections.observableArrayList();
+        musicPlayer = new MusicPlayerController(model, this);
+
+//        try {
+//            if (model.getUser() == null && model.getAllSong() != null) {
+//                filteredData = new FilteredList<>(songView.getSongList(), p -> true);
+//            } else if (model.getUser() != null && model.getUserSongs() != null) {
+//                filteredData = new FilteredList<>(songView.getSongList(), p -> true);
+//            }
+//        } catch (SQLException ex) {
+//        }
         try {
             loader = new FXMLLoader(getClass().getResource("/View/Dashboard.fxml"));
             loader.setController(this);
             root = (Parent) loader.load();
             scene = new Scene(root);
-            
-            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-            stage.setTitle("Dashboard");
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.setX(10);
-            stage.setY(dim.getHeight()/2 - 350);
-            stage.show();
+
+            this.stage.setTitle("Dashboard");
+            this.stage.setScene(scene);
+            this.stage.centerOnScreen();
+            this.stage.setResizable(false);
+            this.stage.initStyle(StageStyle.UNDECORATED);
+            this.stage.show();
         } catch (IOException ie) {
         }
-        
-        super.controller.buildMusicPlayer();
+
         init();
     }
-    
+
     public void initialize() {
-        newPlaylist.setOnAction(event -> {
-            
+        upload.setOnAction(event -> {
+            controller.getSongView().uploadSong();
         });
-        musicPlayer.setOnAction(event -> {
-            super.controller.buildMusicPlayer();
+        playlists.setOnMouseEntered(event -> {
+            lookPlaylist.setVisible(true);
         });
-        stage.setOnCloseRequest(event -> {
+        playlists.setOnMouseExited(event -> {
+            lookPlaylist.setVisible(false);
+        });
+        playlists.setOnAction(event -> {
+            if (playlistPane.isVisible()) {
+                playlistPane.setVisible(false);
+                playlistPane.setDisable(true);
+            } else {
+                playlistPane.setVisible(true);
+                playlistPane.setDisable(false);
+            }
+        });
+        createPlaylist.setOnAction(event -> {
+            controller.createPlaylist();
+            addPlaylist(new Playlist());
+        });
+        playPlaylist.setOnAction(event -> {
+            if (model.getUser() == null) {
+                model.getQueue().setSongs(model.getSongs());
+                musicPlayer.playMusic();
+            }
+        });
+        play.setOnMouseEntered(event -> {
+            play.setPrefSize(42, 42);
+            play.setLayoutX(574);
+        });
+        play.setOnMouseExited(event -> {
+            play.setPrefSize(40, 40);
+            play.setLayoutX(575);
+        });
+        play.setOnAction(event -> {
+            if (musicPlayer.isPause()) {
+                play.setStyle("-fx-background-image: url('/Files/pause.png');");
+            } else {
+                play.setStyle("-fx-background-image: url('/Files/play.png');");
+            }
+            musicPlayer.playMusic();
+        });
+        repeat.setOnMouseEntered(event -> {
+            if (musicPlayer.getRepeat() == 0) {
+                repeat.setStyle("-fx-background-image: url('/Files/repeat_hover.png');");
+            } else if (musicPlayer.getRepeat() == 1) {
+                repeat.setStyle("-fx-background-image: url('/Files/repeat_hover.png');");
+            } else if (musicPlayer.getRepeat() == 2) {
+                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked_hover.png');");
+            }
+
+        });
+        repeat.setOnMouseExited(event -> {
+            if (musicPlayer.getRepeat() == 0) {
+                repeat.setStyle("-fx-background-image: url('/Files/repeat.png');");
+            } else if (musicPlayer.getRepeat() == 1) {
+                repeat.setStyle("-fx-background-image: url('/Files/repeat_clicked.png');");
+            } else if (musicPlayer.getRepeat() == 2) {
+                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked.png');");
+            }
+        });
+        repeat.setOnAction(event -> {
+            if (musicPlayer.getRepeat() == 0) {
+                musicPlayer.setRepeat(1);
+                repeat.setStyle("-fx-background-image: url('/Files/repeat_clicked.png');");
+            } else if (musicPlayer.getRepeat() == 1) {
+                musicPlayer.setRepeat(2);
+                repeat.setStyle("-fx-background-image: url('/Files/repeat_one_clicked.png');");
+            } else if (musicPlayer.getRepeat() == 2) {
+                musicPlayer.setRepeat(0);
+                repeat.setStyle("-fx-background-image: url('/Files/repeat.png');");
+            }
+        });
+        shuffle.setOnMouseEntered(event -> {
+            shuffle.setStyle("-fx-background-image: url('/Files/shuffle_hover.png');");
+        });
+        shuffle.setOnMouseExited(event -> {
+            if (musicPlayer.isShuffle()) {
+                shuffle.setStyle("-fx-background-image: url('/Files/shuffle_clicked.png');");
+            } else {
+                shuffle.setStyle("-fx-background-image: url('/Files/shuffle.png');");
+            }
+        });
+        shuffle.setOnAction(event -> {
+            if (musicPlayer.isShuffle()) {
+                musicPlayer.setShuffle(false);
+                shuffle.setStyle("-fx-background-image: url('/Files/shuffle.png');");
+            } else {
+                musicPlayer.setShuffle(true);
+                shuffle.setStyle("-fx-background-image: url('/Files/shuffle_clicked.png');");
+            }
+        });
+        speaker.setOnMouseEntered(event -> {
+            if (musicPlayer.isMute()) {
+                speaker.setStyle("-fx-background-image: url('/Files/mute_hover.png');");
+            } else {
+                speaker.setStyle("-fx-background-image: url('/Files/volume_hover.png');");
+            }
+        });
+        speaker.setOnMouseExited(event -> {
+            if (musicPlayer.isMute()) {
+                speaker.setStyle("-fx-background-image: url('/Files/mute.png');");
+            } else {
+                speaker.setStyle("-fx-background-image: url('/Files/volume.png');");
+            }
+        });
+        speaker.setOnAction(event -> {
+            if (musicPlayer.isMute()) {
+                musicPlayer.setMute(false);
+                speaker.setStyle("-fx-background-image: url('/Files/volume.png');");
+            } else {
+                musicPlayer.setMute(true);
+                speaker.setStyle("-fx-background-image: url('/Files/mute.png');");
+            }
+        });
+        list.setOnMouseEntered(event -> {
+            list.setStyle("-fx-background-image: url('/Files/list_hover.png');");
+        });
+        list.setOnMouseExited(event -> {
+            list.setStyle("-fx-background-image: url('/Files/list.png');");
+        });
+        login.setOnMouseEntered(event -> {
+            if (model.getUser() != null) {
+                login.setStyle("-fx-background-image: url('/Files/viewprofile_button_clicked.png')");
+            } else {
+                login.setStyle("-fx-background-image: url('/Files/login_button_clicked.png');");
+            }
+        });
+        login.setOnMouseExited(event -> {
+            if (model.getUser() != null) {
+                login.setStyle("-fx-background-image: url('/Files/viewprofile_button.png')");
+            } else {
+                login.setStyle("-fx-background-image: url('/Files/login_button.png');");
+            }
+        });
+        login.setOnAction(event -> {
+            if (model.getUser() == null) {
+                controller.login();
+            } else {
+                controller.viewProfile();
+            }
+        });
+        signup.setOnMouseEntered(event -> {
+            if (model.getUser() != null) {
+                signup.setStyle("-fx-background-image: url('/Files/logout_button_clicked.png')");
+            } else {
+                signup.setStyle("-fx-background-image: url('/Files/signup_button_red-black_clicked.png');");
+            }
+        });
+        signup.setOnMouseExited(event -> {
+            if (model.getUser() != null) {
+                signup.setStyle("-fx-background-image: url('/Files/logout_button.png')");
+            } else {
+                signup.setStyle("-fx-background-image: url('/Files/signup_button_red-black.png');");
+            }
+        });
+        signup.setOnAction(event -> {
+            if (model.getUser() != null) {
+                model.logout();
+            } else {
+                controller.signin();
+            }
+        });
+        close.setOnMouseEntered(event -> {
+            close.setPrefSize(25, 25);
+        });
+        close.setOnMouseExited(event -> {
+            close.setPrefSize(23, 23);
+        });
+        search.setOnMouseEntered(event -> {
+            search.setPrefSize(32, 32);
+        });
+        search.setOnMouseExited(event -> {
+            search.setPrefSize(30, 30);
+        });
+        minim.setOnMouseEntered(event -> {
+            minim.setPrefSize(25, 25);
+        });
+        minim.setOnMouseExited(event -> {
+            minim.setPrefSize(23, 23);
+        });
+        profile.setOnMouseEntered(event -> {
+            profile.setPrefSize(42, 42);
+            profile.setLayoutX(1091);
+        });
+        profile.setOnMouseExited(event -> {
+            profile.setPrefSize(40, 40);
+            profile.setLayoutX(1092);
+        });
+        profile.setOnAction(event -> {
+            if (showProfile) {
+                profilePane.setVisible(false);
+                profilePane.setDisable(true);
+                showProfile = false;
+            } else {
+                profilePane.setVisible(true);
+                profilePane.setDisable(false);
+                showProfile = true;
+            }
+        });
+        minim.setOnAction(event -> {
+            stage.setIconified(true);
+        });
+        close.setOnAction(event -> {
             System.exit(0);
+            stage.close();
+        });
+        table.setRowFactory(table -> {
+            TableRow<SongInterface> row = new TableRow<>();
+            row.hoverProperty().addListener((Observable observable) -> {
+                SongInterface song = row.getItem();
+
+                if (song != null) {
+                    if (row.isHover()) {
+                        model.setSelectedSong(song);
+                        if (model.getUser() == null) {
+                            model.getSelectedSong().getAdd().setVisible(true);
+                            model.getSelectedSong().getAdd().setDisable(false);
+                            model.getSelectedSong().getDel().setVisible(true);
+                            model.getSelectedSong().getDel().setDisable(false);
+                        } else {
+                            model.getSelectedSong().getAdd().setVisible(true);
+                            model.getSelectedSong().getAdd().setDisable(false);
+                            model.getSelectedSong().getDel().setVisible(true);
+                            model.getSelectedSong().getDel().setDisable(false);
+                            model.getSelectedSong().getEdit().setVisible(true);
+                            model.getSelectedSong().getEdit().setDisable(false);
+                        }
+                    } else {
+                        model.getSelectedSong().getAdd().setVisible(false);
+                        model.getSelectedSong().getAdd().setDisable(true);
+                        model.getSelectedSong().getDel().setVisible(false);
+                        model.getSelectedSong().getDel().setDisable(true);
+                        model.getSelectedSong().getEdit().setVisible(false);
+                        model.getSelectedSong().getEdit().setDisable(true);
+                    }
+
+                    model.getSelectedSong().getAdd().setOnAction(event -> {
+
+                    });
+                    model.getSelectedSong().getAdd().setOnMouseEntered(event -> {
+                        model.getSelectedSong().getAdd().setPrefSize(32, 32);
+                    });
+                    model.getSelectedSong().getAdd().setOnMouseExited(event -> {
+                        model.getSelectedSong().getAdd().setPrefSize(30, 30);
+                    });
+
+                    model.getSelectedSong().getEdit().setOnAction(event -> {
+                        controller.editSong();
+                    });
+                    model.getSelectedSong().getEdit().setOnMouseEntered(event -> {
+                        model.getSelectedSong().getEdit().setPrefSize(32, 32);
+                    });
+                    model.getSelectedSong().getEdit().setOnMouseExited(event -> {
+                        model.getSelectedSong().getEdit().setPrefSize(30, 30);
+                    });
+
+                    model.getSelectedSong().getDel().setOnAction(event -> {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Delete Song");
+                        alert.setHeaderText("Are you sure you want to delete " + model.getSelectedSong().getName());
+//                        alert.setContentText("Are you sure you want to delete " + model.getSelectedSong().getName());
+                        Optional<ButtonType> option = alert.showAndWait();
+                        if (option.get() == ButtonType.OK) {
+                            if (model.getUser() == null) {
+                                model.removeSongLocally(model.getSelectedSong());
+                            } else {
+                                try {
+                                    model.deleteSong(model.getSelectedSong().getSongid());
+                                } catch (SQLException ex) {
+                                }
+                            }
+                        } else if (option.get() == ButtonType.CANCEL) {
+                            event.consume();
+                        }
+
+                    });
+                    model.getSelectedSong().getDel().setOnMouseEntered(event -> {
+                        model.getSelectedSong().getDel().setPrefSize(32, 32);
+                    });
+                    model.getSelectedSong().getDel().setOnMouseExited(event -> {
+                        model.getSelectedSong().getDel().setPrefSize(30, 30);
+                    });
+                }
+            });
+
+            return row;
         });
         table.setOnMouseClicked(event -> {
-            Song song = null;
-            song = (Song) table.getSelectionModel().getSelectedItem();
-            if (event.getClickCount() == 1) {
-                if(song != null) {
-                    edit.setVisible(true);
-                    edit.setDisable(false);
-                    delete.setVisible(true);
-                    delete.setDisable(false);
-                }
-            } else if(event.getClickCount() == 2) {
-                if(song != null) {
-                    super.controller.setCurrentSong(song);
-                }
+            model.setSelectedSong((SongInterface) table.getSelectionModel().getSelectedItem());
+
+            if (event.getClickCount() == 2) {
+                model.setCurrentSong((SongInterface) table.getSelectionModel().getSelectedItem());
+
+            }
+
+            if (playlistPane.isVisible()) {
+                playlistPane.setVisible(false);
+                playlistPane.setDisable(true);
+            }
+        });
+//        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+//            if (filteredData != null) {
+//                filteredData.setPredicate(song -> {
+//                    if (newValue == null || newValue.isEmpty()) {
+//                        return true;
+//                    }
+//
+//                    String filter = newValue.toLowerCase();
+//                    if (song.getName().toLowerCase().contains(filter)) {
+//                        return true;
+//                    }
+//
+//                    return false;
+//                });
+//
+//                songView.updateTable(filteredData);
+//            }
+//        });
+        musicSlider.valueProperty().addListener((Observable observable) -> {
+            if (musicSlider.isValueChanging()) {
+                Duration duration = musicPlayer.getCurrentSong().getMedia().getDuration();
+                musicPlayer.getCurrentSong().seek(duration.multiply(musicSlider.getValue() / 100));
             }
         });
     }
-    
+
     private void init() {
-        scroll.setPrefHeight(220);
-        edit.setVisible(false);
-        edit.setDisable(true);
-        delete.setVisible(false);
-        delete.setDisable(true);
-        
-        TableColumn num = new TableColumn("#");
-        num.setCellValueFactory(new PropertyValueFactory("songid"));
-        num.setStyle("-fx-alignment: CENTER;");
-        num.setPrefWidth(50);
-        TableColumn title = new TableColumn("Title");
-        title.setCellValueFactory(new PropertyValueFactory("name"));
-        title.setPrefWidth(150);
-        TableColumn artist = new TableColumn("Artist");
-        artist.setCellValueFactory(new PropertyValueFactory("artist"));
-        artist.setPrefWidth(150);
-        TableColumn album = new TableColumn("Album");
-        album.setCellValueFactory(new PropertyValueFactory("album"));
-        album.setPrefWidth(150);
-        TableColumn year = new TableColumn("Year");
-        year.setCellValueFactory(new PropertyValueFactory("year"));
-        year.setStyle("-fx-alignment: CENTER;");
-        year.setPrefWidth(50);
-        TableColumn genre = new TableColumn("Genre");
-        genre.setCellValueFactory(new PropertyValueFactory("genre"));
-        genre.setPrefWidth(100);
-        TableColumn duration = new TableColumn("Duration");
-        duration.setCellValueFactory(new PropertyValueFactory("duration"));
-        duration.setStyle("-fx-alignment: CENTER;");
-        duration.setPrefWidth(100);
-        
-        table.getColumns().setAll(num, title, artist, album, year, genre, duration);
-        
-        Song song = new Song();
-        song.setSongid("1234");
-        song.setName("Aloha");
-        song.setAlbum("Hawai");
-        song.setArtist("Larry");
-        song.setGenre("Hip Hop");
-        song.setYear(2019);
-        song.setLength(198);
-        
-        super.controller.addSong(song);
-        table.getItems().add(song);
+        controller.init(model, table, listLabel, stage);
+        playPlaylist.setDisable(true);
+        playPlaylist.setVisible(false);
+
+        if (LocalDateTime.now().getHour() >= 0 && LocalDateTime.now().getHour() < 12) {
+            if (model.getUser() != null) {
+                greetings.setText("Good morning, " + model.getUser().getName() + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good morning, Guest!");
+                or.setVisible(true);
+            }
+        } else if (LocalDateTime.now().getHour() == 12) {
+            if (model.getUser() != null) {
+                greetings.setText("Good day, " + model.getUser().getName() + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good day, Guest!");
+                or.setVisible(true);
+            }
+        } else if (LocalDateTime.now().getHour() > 12 && LocalDateTime.now().getHour() < 18) {
+            if (model.getUser() != null) {
+                greetings.setText("Good afternoon, " + model.getUser().getName() + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good afternoon, Guest!");
+                or.setVisible(true);
+            }
+        } else if (LocalDateTime.now().getHour() >= 18 && LocalDateTime.now().getHour() <= 23) {
+            if (model.getUser() != null) {
+                greetings.setText("Good evening, " + model.getUser().getName() + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good evening, Guest!");
+                or.setVisible(true);
+            }
+        }
+
+        profilePane.setVisible(false);
+        profilePane.setDisable(true);
+        playlistPane.setVisible(false);
+        playlistPane.setDisable(true);
+        lookPlaylist.setVisible(false);
+        showProfile = false;
+
+        playlistVBox.setMaxHeight(Double.MAX_VALUE);
+        playlistVBox.setSpacing(20);
+
+        if (model.getUser() != null && model.getUser().getPlaylists() != null) {
+            for (int i = 0; i < model.getUser().getSongs().size(); i++) {
+                Playlist p = new Playlist();
+                p.setName("Playlist" + (i + 1));
+
+                Label label = new Label();
+                label.setText("     " + p.getName());
+                label.setAlignment(Pos.CENTER_LEFT);
+                label.setFont(new Font("Segoe UI", 14));
+                label.setStyle("-fx-text-fill: gray;");
+                label.setPrefWidth(200);
+
+                MenuItem item = new MenuItem("DeletePlaylist");
+                item.setOnAction(event -> {
+                    listOfPlaylist.remove(label);
+                    updatePlaylist();
+                });
+                ContextMenu menu = new ContextMenu();
+                menu.getItems().add(item);
+                label.setContextMenu(menu);
+
+                label.setOnMouseClicked(event -> {
+                    System.out.println(p.getName());
+                });
+                label.setOnMouseEntered(event -> {
+                    label.setStyle("-fx-text-fill: white;");
+                });
+                label.setOnMouseExited(event -> {
+                    label.setStyle("-fx-text-fill: gray;");
+                });
+
+                listOfPlaylist.add(label);
+                updatePlaylist();
+            }
+        }
     }
-    
+
+    public void addPlaylist(Playlist p) {
+        if (listOfPlaylist.get(0).getText().trim().equalsIgnoreCase("No playlist created")) {
+            listOfPlaylist.clear();
+        }
+
+        p.setName("NewPlaylist");
+
+        Label label = new Label();
+        label.setText("     " + p.getName());
+        label.setAlignment(Pos.CENTER_LEFT);
+        label.setFont(new Font("Segoe UI", 14));
+        label.setStyle("-fx-text-fill: gray;");
+        label.setPrefWidth(200);
+
+        MenuItem item = new MenuItem("DeletePlaylist");
+        item.setOnAction(event -> {
+            listOfPlaylist.remove(label);
+            updatePlaylist();
+        });
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().add(item);
+        label.setContextMenu(menu);
+
+        label.setOnMouseClicked(event -> {
+            System.out.println(p.getName());
+        });
+        label.setOnMouseEntered(event -> {
+            label.setStyle("-fx-text-fill: white;");
+        });
+        label.setOnMouseExited(event -> {
+            label.setStyle("-fx-text-fill: gray;");
+        });
+
+        listOfPlaylist.add(label);
+        updatePlaylist();
+    }
+
+    public void updatePlaylist() {
+        playlistVBox.getChildren().clear();
+        if (listOfPlaylist.size() == 0) {
+            Label label = new Label();
+            label.setText("     No playlist created");
+            label.setAlignment(Pos.CENTER_LEFT);
+            label.setFont(new Font("Segoe UI", 14));
+            label.setStyle("-fx-text-fill: gray;");
+            label.setPrefWidth(200);
+            listOfPlaylist.add(label);
+        }
+        playlistVBox.getChildren().setAll(listOfPlaylist);
+    }
+
+    public void updateSlider() {
+        Platform.runLater(() -> {
+            start.setText(getDuration((int) musicPlayer.getCurrentSong().getCurrentTime().toSeconds()));
+            if (start.getText().equalsIgnoreCase(end.getText())) {
+                play.setStyle("-fx-background-image: url('/Pictures/pause.png');");
+            }
+            musicSlider.setValue(musicPlayer.getCurrentSong().getCurrentTime().divide(musicPlayer.getCurrentSong().getMedia().getDuration()).toMillis() * 100);
+        });
+    }
+
     @Override
     public void update() {
-        songName.setText(super.controller.getCurrentSong().getName());
-        artistName.setText(super.controller.getCurrentSong().getArtist());
+        if (model.getSongs().size() > 0) {
+            playPlaylist.setDisable(false);
+            playPlaylist.setVisible(true);
+        }
+
+        if (model.getCurrentSong() != null) {
+            songName.setText(model.getCurrentSong().getName());
+            artistName.setText(model.getCurrentSong().getArtist());
+            int x = model.getCurrentSong().getLength();
+            end.setText(String.format("%02d", x / 60) + ":" + String.format("%02d", x % 60));
+        }
+
+        try {
+            controller.getSongView().loadSong();
+        } catch (SQLException ex) {
+        }
+        updatePlaylist();
+
+        if (model.getUser() != null) {
+            login.setStyle("-fx-background-image: url('/Files/viewprofile_button.png')");
+            signup.setStyle("-fx-background-image: url('/Files/logout_button.png')");
+        } else {
+            login.setStyle("-fx-background-image: url('/Files/login_button.png');");
+            signup.setStyle("-fx-background-image: url('/Files/signup_button_red-black.png');");
+        }
+
+        if (LocalDateTime.now().getHour() >= 0 && LocalDateTime.now().getHour() < 12) {
+            if (model.getUser() != null) {
+                greetings.setText("Good morning, " + model.getUser().getName().substring(0, model.getUser().getName().indexOf(" ")) + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good morning, Guest!");
+                or.setVisible(true);
+            }
+        } else if (LocalDateTime.now().getHour() == 12) {
+            if (model.getUser() != null) {
+                greetings.setText("Good day, " + model.getUser().getName().substring(0, model.getUser().getName().indexOf(" ")) + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good day, Guest!");
+                or.setVisible(true);
+            }
+        } else if (LocalDateTime.now().getHour() > 12 && LocalDateTime.now().getHour() < 18) {
+            if (model.getUser() != null) {
+                greetings.setText("Good afternoon, " + model.getUser().getName().substring(0, model.getUser().getName().indexOf(" ")) + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good afternoon, Guest!");
+                or.setVisible(true);
+            }
+        } else if (LocalDateTime.now().getHour() >= 18 && LocalDateTime.now().getHour() <= 23) {
+            if (model.getUser() != null) {
+                greetings.setText("Good evening, " + model.getUser().getName().substring(0, model.getUser().getName().indexOf(" ")) + "!");
+                or.setVisible(false);
+            } else {
+                greetings.setText("Good evening, Guest!");
+                or.setVisible(true);
+            }
+        }
+    }
+
+    public String getDuration(int time) {
+        return String.format("%02d", time / 60) + ":" + String.format("%02d", time % 60);
     }
 }

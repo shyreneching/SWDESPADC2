@@ -15,7 +15,7 @@ public class AccountService implements Service{
 
     //adds account to the database. Must be COMPLETE information
     public boolean add(Object o) throws SQLException {
-        AccountInterface a = (Account) o;
+        AccountInterface a = (AccountInterface) o;
 
         // Get a connection:
         Connection connection = pool.checkOut();
@@ -150,10 +150,10 @@ public class AccountService implements Service{
         // Get a connection:
         Connection connection = pool.checkOut();
 
-        AccountInterface a = (Account) o;
+        AccountInterface a = (AccountInterface) o;
         String query = "UPDATE accounts SET "
                 + "name = ?, "
-                + "password = ?, "
+                + "password = ? "
                 + "WHERE username= ?";
         PreparedStatement statement = connection.prepareStatement(query);
         try {

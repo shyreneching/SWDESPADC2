@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.sql.SQLException;
-import java.sql.SQLOutput;
 
 import jaco.mp3.player.MP3Player;
 import org.apache.tika.exception.TikaException;
@@ -33,7 +32,7 @@ public class AudioParser implements AudioParserInterface{
     * song location
     * song filename
     * */
-    public SongInterface getSongDetails(String location){
+    public SongInterface getSongDetails(String location) {
         String fileLocation = location;
         SongInterface s = new Song();
 
@@ -63,7 +62,7 @@ public class AudioParser implements AudioParserInterface{
             if (metadata.get("xmpDM:releaseDate") != null && !(metadata.get("xmpDM:releaseDate").equals("")))
                 s.setYear(Integer.parseInt(metadata.get("xmpDM:releaseDate")));
             if (metadata.get("xmpDM:trackNumber") != null && !(metadata.get("xmpDM:trackNumber").equals("")))
-            s.setTrackNumber(Integer.parseInt(metadata.get("xmpDM:trackNumber")));
+                s.setTrackNumber(Integer.parseInt(metadata.get("xmpDM:trackNumber")));
             Double d = Double.parseDouble(metadata.get("xmpDM:duration"));
             d =  d/1000;
             s.setLength(d.intValue());
@@ -72,11 +71,7 @@ public class AudioParser implements AudioParserInterface{
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (TikaException e) {
+        } catch (IOException | SAXException | TikaException | NumberFormatException e) {
             e.printStackTrace();
         }
         return s;
@@ -87,7 +82,7 @@ public class AudioParser implements AudioParserInterface{
     // Returns null if no album art
     public File getSongImage(SongInterface s) throws InvalidDataException, IOException, UnsupportedTagException, NotSupportedException {
         Mp3File music = new Mp3File(s.getFilelocation());
-        File outputfile = new File(s.getArtist() + "_" + s.getAlbum() + ".jpg");
+        File outputfile = new File("src/Music/" + s.getArtist() + "_" + s.getAlbum() + ".jpg");
         if (music.hasId3v2Tag()){
             ID3v2 id3v2tag = music.getId3v2Tag();
             byte[] imageData = id3v2tag.getAlbumImage();
@@ -128,7 +123,7 @@ public class AudioParser implements AudioParserInterface{
         id3v2Tag.setOriginalArtist("Another Artist");*/
         id3v2Tag.setAlbumArtist(s.getArtist());
         //temporarily sets the file name to "temp.mp3"
-        mp3file.save("temp.mp3");
+        mp3file.save("src/Music/temp.mp3");
         //gets the old file and deletes it
         File file = new File(s.getFilename());
         if (file != null)
@@ -172,7 +167,7 @@ public class AudioParser implements AudioParserInterface{
         id3v2Tag.setOriginalArtist("Another Artist");*/
         id3v2Tag.setAlbumArtist(changed.getArtist());
         //temporarily sets the file name to "temp.mp3"
-        mp3file.save("temp.mp3");
+        mp3file.save("src/Music/temp.mp3");
 
         //takes the file again, place it in a song file and delete the mp3 file
         File file = new File("src/Music/temp.mp3");
@@ -324,26 +319,15 @@ public class AudioParser implements AudioParserInterface{
             e.printStackTrace();
         }
     }*/
-
+    /*
     public static void main(String args[]) throws SQLException {
-        String filelocation = "src/Music/Echosmith - Bright.mp3";
+        String filelocation = "src/Music/Bea Miller - Fire N Gold.mp3";
         SongInterface song = CreateSongFromLocal.CreateSong(filelocation);
         song.setSongid("S01");
         song.setUser("User");
-        AccountService accountService = new AccountService();
-        AccountInterface account;
-        if (accountService.getAll().size() == 0) {
-            account = new Account();
-            account.setUsername("User");
-            account.setName("Ima User");
-            account.setPassword("password");
-            accountService.add(account);
-        } else {
-            account = (Account)accountService.getAll().get(0);
-        }
+
         SongService songService = new SongService();
-        if (songService.getAll().size() == 0)
-            songService.add(song);
+        songService.add(song);
 
         MP3Player mp3Player = new MP3Player();
         for(Object s : songService.getAll()){
@@ -351,8 +335,8 @@ public class AudioParser implements AudioParserInterface{
         }
         mp3Player.play();
         while (true){
-            if(mp3Player.isStopped())
-                break;
+
         }
     }
+*/
 }
