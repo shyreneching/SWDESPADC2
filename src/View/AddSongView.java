@@ -7,7 +7,6 @@ package View;
 
 import Model.FacadeModel;
 import Model.PlaylistInterface;
-import Model.Queue;
 import java.io.IOException;
 import java.sql.SQLException;
 import javafx.fxml.FXML;
@@ -76,7 +75,8 @@ public class AddSongView extends View {
         label.setPrefWidth(200);
 
         label.setOnMouseClicked(event -> {
-            
+            model.getCurrentPlaylist().getSongs().add(model.getSelectedSong());
+            model.update();
             stage.close();
         });
 
@@ -91,7 +91,9 @@ public class AddSongView extends View {
                 newp.setPrefWidth(200);
 
                 newp.setOnMouseClicked(event -> {
-                    p.getSongs().add(model.getSelectedSong());
+                    if(!p.getSongs().contains(model.getSelectedSong())) {
+                        p.getSongs().add(model.getSelectedSong());
+                    }
                     stage.close();
                 });
 
@@ -100,7 +102,7 @@ public class AddSongView extends View {
         } else {
             try {
                 if (model.getUserPlaylist() != null) {
-                    for (PlaylistInterface p : model.getUser().getPlaylists()) {
+                    for (PlaylistInterface p : model.getUserPlaylist()) {
                         Label newp = new Label();
                         newp.setText("     " + "Add song to " + p.getName());
                         newp.setAlignment(Pos.CENTER_LEFT);

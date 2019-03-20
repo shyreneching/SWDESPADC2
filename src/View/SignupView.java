@@ -3,6 +3,9 @@ package View;
 import Model.Account;
 import Model.AccountInterface;
 import Model.FacadeModel;
+import Model.Playlist;
+import Model.PlaylistInterface;
+import Model.SongInterface;
 import javafx.fxml.FXML;
 
 import javafx.fxml.FXMLLoader;
@@ -16,6 +19,7 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 
 public class SignupView extends View {
@@ -85,6 +89,17 @@ public class SignupView extends View {
                             try {
                                 if (model.createUser(a)) {
                                     model.setUser((AccountInterface) a);
+//                                    for(SongInterface ss : model.getSongs()) {
+//                                        model.addSong(ss.getFilelocation());
+//                                    }
+//                                    for(PlaylistInterface pp : model.getGroups()) {
+//                                        PlaylistInterface p = new Playlist();
+//                                        p.setName(pp.getName());
+//                                        model.addPlaylist(p);
+//                                        for(SongInterface ss : pp.getSongs()) {
+//                                            model.addSongToPlaylist(ss, p);
+//                                        }
+//                                    }
                                     stage.close();
                                 } else {
                                     usernamewarn.setText("**Username is already taken**");

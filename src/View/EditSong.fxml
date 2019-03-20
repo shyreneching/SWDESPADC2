@@ -128,5 +128,10 @@
             <Font name="Segoe UI Bold" size="15.0" />
          </font>
       </Button>
+      <Button fx:id="remove" contentDisplay="CENTER" layoutX="40.0" layoutY="288.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="114.0" style="-fx-background-color: #e03753;" text="REMOVE" textFill="WHITE">
+         <font>
+            <Font name="Segoe UI Bold" size="15.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

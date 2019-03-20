@@ -71,6 +71,7 @@ public class AddPlaylistView extends View {
                     model.addPlaylist(p);
                 } catch (SQLException ex) { }
             }
+            model.update();
             stage.close();
         });
     }

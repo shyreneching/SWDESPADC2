@@ -6,11 +6,9 @@
 package Controller;
 
 import Model.FacadeModel;
-import Model.SongInterface;
 import View.DashboardView;
-import java.util.ArrayList;
-import java.util.List;
-import javafx.collections.ObservableList;
+import java.sql.SQLException;
+import javafx.beans.Observable;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -20,10 +18,10 @@ import javafx.util.Duration;
  * @author Stanley Sie
  */
 public class MusicPlayerController {
-    
+
     private DashboardView main;
     private FacadeModel model;
-    
+
     private boolean pause;
     private boolean shuffle;
     private boolean mute;
@@ -31,23 +29,21 @@ public class MusicPlayerController {
     private int currentIndex;
     private MediaPlayer currentSong;
     private Media media;
-    private List<MediaPlayer> list;
-    
+
     public MusicPlayerController(FacadeModel model, DashboardView main) {
         this.main = main;
         this.model = model;
-        list = new ArrayList<>();
         currentIndex = 0;
+        pause = true;
+        shuffle = false;
+        mute = false;
+        repeat = 0;
     }
 
-    public List<MediaPlayer> getList() {
-        return list;
+    public MediaPlayer getSong() {
+        return new MediaPlayer(new Media(model.getCurrentPlaylist().getSongs().get(currentIndex).getSongfile().toURI().toString()));
     }
 
-    public void setList(List<MediaPlayer> list) {
-        this.list = list;
-    }
-    
     public MediaPlayer getCurrentSong() {
         return currentSong;
     }
@@ -55,31 +51,85 @@ public class MusicPlayerController {
     public void setCurrentSong(MediaPlayer currentSong) {
         this.currentSong = currentSong;
     }
-    
+
     public void playMusic() {
-        if(pause) {
+        if (pause) {
             currentSong.play();
             pause = false;
         } else {
             currentSong.pause();
             pause = true;
         }
+        
+        currentSong.currentTimeProperty().addListener((Observable observable) -> {
+            main.updateSlider();
+        });
+
+        currentSong.setOnEndOfMedia(() -> {
+            pause = true;
+            if (repeat == 2) {
+                currentSong.stop();
+                currentSong.setStartTime(Duration.ZERO);
+                currentSong.play();
+            } else if (currentIndex < model.getCurrentPlaylist().getSongs().size()) {
+                nextMusic();
+            }
+        });
     }
-    
+
+    public void stopMusic() {
+        if (currentSong != null) {
+            currentSong.stop();
+            pause = true;
+            main.resetSlider();
+        }
+    }
+
     public void nextMusic() {
-        
+        currentSong.stop();
+        setPause(true);
+        if (shuffle) {
+            int x;
+            do {
+                x = (int) (Math.random() * model.getCurrentPlaylist().getSongs().size());
+            } while (x == currentIndex);
+            currentIndex = x;
+        } else {
+            if (currentIndex < model.getCurrentPlaylist().getSongs().size() - 1) {
+                currentIndex += 1;
+            } else {
+                currentIndex = 0;
+            }
+        }
+        main.startList();
+        main.endList();
+        model.setCurrentSong(model.getCurrentPlaylist().getSongs().get(currentIndex));
+        setCurrentSong(getSong());
+        playMusic();
     }
-    
+
     public void prevMusic() {
-        
-    }
-    
-    public void fastForward() {
-        
-    }
-    
-    public void backTrack() {
-        
+        currentSong.stop();
+        currentSong.setStartTime(Duration.ZERO);
+        setPause(true);
+        if (shuffle) {
+            int x;
+            do {
+                x = (int) (Math.random() * model.getCurrentPlaylist().getSongs().size());
+            } while (x == currentIndex);
+            currentIndex = x;
+        } else {
+            if (currentIndex > 0) {
+                currentIndex -= 1;
+            } else {
+                currentIndex = model.getCurrentPlaylist().getSongs().size() - 1;
+            }
+        }
+        main.startList();
+        main.endList();
+        model.setCurrentSong(model.getCurrentPlaylist().getSongs().get(currentIndex));
+        setCurrentSong(getSong());
+        playMusic();
     }
 
     public boolean isPause() {
@@ -120,26 +170,5 @@ public class MusicPlayerController {
 
     public void setCurrentIndex(int currentIndex) {
         this.currentIndex = currentIndex;
-    }
-    
-    public void setSongs(ObservableList<SongInterface> songs) {
-        list.clear();
-        for(SongInterface s : songs) {
-            list.add(new MediaPlayer(new Media(s.getSongfile().toURI().toString())));
-        }
-    }
-    
-    public void playSongs(SongInterface song) {
-        list.add(new MediaPlayer(new Media(song.getSongfile().toURI().toString())));
-        if(currentSong != null && currentSong.isAutoPlay()) {
-            currentSong.stop();
-        }
-        setCurrentSong(list.get(list.size()-1));
-        currentSong.setStartTime(Duration.ZERO);
-        currentSong.play();
-    }
-    
-    public void addSongs(SongInterface song) {
-        list.add(new MediaPlayer(new Media(song.getSongfile().toURI().toString())));
     }
 }

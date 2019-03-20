@@ -19,7 +19,7 @@ public class PlaylistService implements Service{
     public boolean add(Object o) throws SQLException{return false;}
 
     //adds playlist class and the account that owns the playlist. Songs in the playlist must already be imported to the database beforehand
-    public boolean add(PlaylistInterface p, Account a) throws SQLException {
+    public boolean add(PlaylistInterface p, AccountInterface a) throws SQLException {
         Connection connection = pool.checkOut();
         String query = "INSERT INTO playlist VALUE (?, ?, ?)";
         PreparedStatement statement = connection.prepareStatement(query);
@@ -171,7 +171,7 @@ public class PlaylistService implements Service{
         ObservableList<PlaylistInterface> playlists = FXCollections.observableArrayList();
         ObservableList <SongInterface> songs;
 
-        String query ="SELECT * FROM playlist WHERE username = " + username;
+        String query ="SELECT * FROM playlist WHERE username = '" + username + "'";
         PreparedStatement statement = connection.prepareStatement(query);
         String query2 ="SELECT * FROM songcollection INNER JOIN song ON songcollection.idsong = song.idsong";
         PreparedStatement statement2 = connection.prepareStatement(query2);
@@ -212,12 +212,11 @@ public class PlaylistService implements Service{
                 s.setSongfile(theFile);
                 //takes the exact location of the song
                 s.setFilelocation(theFile.getAbsolutePath());
-
                 for(PlaylistInterface p : playlists){
                     if(p.getPlaylistid().compareTo(playlistid) == 0) {
                         songs = p.getSongs();
                         songs.add(s);
-                        p.setSongs(FXCollections.observableArrayList());
+                        p.setSongs(songs);
                     }
                 }
             }

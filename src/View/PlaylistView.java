@@ -8,17 +8,12 @@ package View;
 import Model.FacadeModel;
 import Model.PlaylistInterface;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 
 /**
  *
@@ -30,51 +25,65 @@ public class PlaylistView extends View {
     private Label listLabel;
     private TableView table;
     private TableColumn title;
-    private TextField changeTitle;
-    private Button saveTitle;
 
     private ObservableList<PlaylistInterface> playlists;
 
-    public PlaylistView(FacadeModel model, TableView table, Label listLabel, TextField changeTitle, Button saveTitle) {
+    public PlaylistView(FacadeModel model, TableView table, Label listLabel) {
         this.model = model;
         this.table = table;
         this.listLabel = listLabel;
-        this.changeTitle = changeTitle;
-        this.saveTitle = saveTitle;
 
         playlists = FXCollections.observableArrayList();
         this.model.attach(this);
 
-        init();
-    }
-
-    private void init() {
-        title = new TableColumn("Title");
-        title.setCellValueFactory(new PropertyValueFactory("name"));
-        title.setPrefWidth(220);
-        title.setStyle("-fx-alignment: CENTER_LEFT;-fx-text-fill: white;");
-        title.setResizable(false);
-
         update();
     }
 
-    public void showPlaylist() {
-        changeTitle.setVisible(false);
-        changeTitle.setDisable(true);
-        saveTitle.setVisible(false);
-        saveTitle.setDisable(true);
-
-        listLabel.setText(model.getCurrentPlaylist().getName());
-        table.getColumns().setAll(title);
-        table.setItems(playlists);
+    public void groupedByAlbum() {
+        listLabel.setText("Albums");
+        try {
+            setPlaylists(model.getAlbumPlaylist());
+        } catch (SQLException ex) { }
+    }
+    
+    public void groupedByArtist() {
+        listLabel.setText("Artists");
+        try {
+            setPlaylists(model.getArtistPlaylist());
+        } catch (SQLException ex) { }
+    }
+    
+    public void groupedByYear() {
+        listLabel.setText("Years");
+        try {
+            setPlaylists(model.getYearPlaylist());
+        } catch (SQLException ex) { }
+    }
+    
+    public void groupedByGenre() {
+        listLabel.setText("Genres");
+        try {
+            setPlaylists(model.getGenrePlaylist());
+        } catch (SQLException ex) { }
     }
 
-    public void loadPlaylist() {
-        
+    public ObservableList<PlaylistInterface> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(ObservableList<PlaylistInterface> playlists) {
+        this.playlists = playlists;
+        update();
     }
 
     @Override
     public void update() {
-
+        title = new TableColumn("Title");
+        title.setCellValueFactory(new PropertyValueFactory("name"));
+        title.setPrefWidth(900);
+        title.setStyle("-fx-alignment: CENTER_LEFT;-fx-text-fill: white;");
+        title.setResizable(false);
+        table.getColumns().setAll(title);
+        table.setItems(playlists);
     }
 }

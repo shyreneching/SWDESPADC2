@@ -12,22 +12,22 @@ public class Song implements SongInterface{
     private Timestamp date;
     private File songfile;
     private String filename, filelocation;
-    private Button play, edit, add, del;
+    private Button favorite, edit, add, del;
 
     public Song(){
         timesplayed = 0;
-        play = new Button();
+        favorite = new Button();
         edit = new Button();
         add = new Button();
         del = new Button();
         
-        play.setPrefSize(30, 30);
+        favorite.setPrefSize(30, 30);
         edit.setPrefSize(30, 30);
         add.setPrefSize(30, 30);
         del.setPrefSize(30, 30);
         
-        play.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
-                + "-fx-background-image: url('/Files/play.png');");
+        favorite.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
+                + "-fx-background-image: url('/Files/starred.PNG');");
         edit.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
                 + "-fx-background-image: url('/Files/edit.png');");
         add.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
@@ -35,8 +35,8 @@ public class Song implements SongInterface{
         del.setStyle("-fx-background-color: transparent; -fx-background-position: center; -fx-background-size: 100%;"
                 + "-fx-background-image: url('/Files/delete.png');");
         
-        play.setVisible(false);
-        play.setDisable(true);
+        favorite.setVisible(false);
+        favorite.setDisable(true);
         edit.setVisible(false);
         edit.setDisable(true);
         add.setVisible(false);
@@ -171,8 +171,8 @@ public class Song implements SongInterface{
         return duration;
     }
 
-    public Button getPlay() {
-        return play;
+    public Button getFavorite() {
+        return favorite;
     }
 
     public Button getEdit() {

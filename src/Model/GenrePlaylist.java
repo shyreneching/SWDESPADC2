@@ -12,8 +12,12 @@ public class GenrePlaylist implements PlaylistList {
         this.songService = new SongService();
     }
 
-    public ObservableList<PlaylistInterface> createPlaylist(String username) throws SQLException {
-        ObservableList<SongInterface> songs = songService.getUserSong(username);
+    public ObservableList<PlaylistInterface> createPlaylist(String username, ObservableList<SongInterface> ss) throws SQLException {
+        ObservableList<SongInterface> songs;
+        if(ss == null)
+            songs = songService.getUserSong(username);
+        else
+            songs = ss;
         ObservableList<PlaylistInterface> playlists = FXCollections.observableArrayList();
         boolean added = false;
 

@@ -251,6 +251,63 @@ public class SongService implements Service{
     }
 
     //get songs with the same name
+    public SongInterface getSongName(String songname, String album, String artist) throws SQLException {
+        Connection connection = pool.checkOut();
+        ObservableList<SongInterface> songs = FXCollections.observableArrayList();
+
+        String query ="SELECT * FROM song WHERE songname = '" + songname +
+                "' AND album = '" + album + "' AND artist = '" + artist + "'";
+        PreparedStatement statement = connection.prepareStatement(query);
+        try {
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()) {
+                Song s = new Song();
+                s.setSongid(rs.getString("idsong"));
+                s.setName(rs.getString("songname"));
+                s.setGenre(rs.getString("genre"));
+                s.setArtist(rs.getString("artist"));
+                s.setAlbum(rs.getString("album"));
+                s.setYear(rs.getInt("year"));
+                s.setTrackNumber(rs.getInt("trackNumber"));
+                s.setLength(rs.getInt("length"));
+                s.setSize(rs.getFloat("size"));
+
+                // sets the name to "Artist-title"
+                s.setFilename("src/Music/" + s.getArtist() + "-" + s.getName() + ".mp3");
+
+                //gets the song from the databse and make put it in a File datatype
+                File theFile = new File(s.getFilename());
+                OutputStream out = new FileOutputStream(theFile);
+                InputStream input = rs.getBinaryStream("songfile");
+                byte[] buffer = new byte[4096];  // how much of the file to read/write at a time
+                while (input.read(buffer) > 0) {
+                    out.write(buffer);
+                }
+
+                s.setSongfile(theFile);
+                //takes the exact location of the song
+                s.setFilelocation(theFile.getAbsolutePath());
+                s.setUser(rs.getString("username"));
+                s.setTimesplayed(rs.getInt("timesplayed"));
+                s.setDate(rs.getTimestamp("dateuploaded"));
+                return s;
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(statement != null) statement.close();
+            if(connection != null)  connection.close();
+        }
+        pool.checkIn(connection);
+        return null;
+    }
+
+
+    //get songs with the same name
     public ObservableList<SongInterface> getSongName(String songname, String username) throws SQLException {
         Connection connection = pool.checkOut();
         ObservableList<SongInterface> songs = FXCollections.observableArrayList();

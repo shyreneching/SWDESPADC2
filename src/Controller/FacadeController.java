@@ -15,10 +15,8 @@ import View.PlaylistView;
 import View.ProfileView;
 import View.SignupView;
 import View.SongListView;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 /**
@@ -61,9 +59,9 @@ public class FacadeController {
         LoginView view = new LoginView(model, songView);
     }
     
-    public void init(FacadeModel model, TableView table, Label listLabel, Stage stage, TextField changeTitle, Button saveTitle) {
-        songView = new SongListView(model, table, listLabel, stage, changeTitle, saveTitle);
-        playlistView = new PlaylistView(model, table, listLabel, changeTitle, saveTitle);
+    public void init(FacadeModel model, TableView table, Label listLabel, Stage stage, TableView table1) {
+        songView = new SongListView(model, table, listLabel, stage);
+        playlistView = new PlaylistView(model, table1, listLabel);
     }
 
     public SongListView getSongView() {

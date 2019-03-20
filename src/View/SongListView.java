@@ -11,15 +11,15 @@ import Model.SongInterface;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -36,30 +36,65 @@ public class SongListView extends View {
     private Label listLabel;
     private TableView table;
     private Stage stage;
-    private TextField changeTitle;
-    private Button saveTitle;
-    
-    private TableColumn title, album, artist, genre, year, add, del, play, edit, duration;
 
-    public SongListView(FacadeModel model, TableView table, Label listLabel, Stage stage, TextField changeTitle, Button saveTitle) {
+    private TableColumn title, album, artist, genre, year, add, del, favorite, edit, duration;
+
+    public SongListView(FacadeModel model, TableView table, Label listLabel, Stage stage) {
         this.model = model;
         this.table = table;
         this.listLabel = listLabel;
         this.stage = stage;
-        this.changeTitle = changeTitle;
-        this.saveTitle = saveTitle;
         songList = FXCollections.observableArrayList();
         this.model.attach(this);
 
-        init();
+        update();
     }
 
-    private void init() {
+    public ObservableList<SongInterface> getSongList() {
+        return songList;
+    }
+
+    public void setSongList(ObservableList<SongInterface> songList) {
+        this.songList = songList;
+        update();
+    }
+
+    public void showSong() {
+        listLabel.setText("Songs");
         try {
             loadSong();
         } catch (SQLException ex) {
         }
+    }
 
+    public void showPlaylist() {
+        listLabel.setText(model.getSelectedPlaylist().getName());
+        setSongList(model.getSelectedPlaylist().getSongs());
+    }
+
+    public void showQueue() {
+        listLabel.setText("Queue");
+        setSongList(model.getCurrentPlaylist().getSongs());
+    }
+
+    public void groupedByMostPlayed() {
+        listLabel.setText("Most Played");
+        setSongList(model.getMostPlayed());
+    }
+
+    public void groupedByFavorite() {
+        listLabel.setText("Favorites");
+        try {
+            if (model.getStarredSongs() != null) {
+                setSongList(model.getStarredSongs().getSongs());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(SongListView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public void update() {
         title = new TableColumn("Title");
         title.setCellValueFactory(new PropertyValueFactory("name"));
         title.setPrefWidth(220);
@@ -85,10 +120,10 @@ public class SongListView extends View {
         duration.setPrefWidth(90);
         duration.setStyle("-fx-alignment: CENTER_LEFT;-fx-text-fill: white;");
         duration.setResizable(false);
-        play = new TableColumn();
-        play.setCellValueFactory(new PropertyValueFactory("play"));
-        play.setPrefWidth(65);
-        play.setResizable(false);
+        favorite = new TableColumn();
+        favorite.setCellValueFactory(new PropertyValueFactory("favorite"));
+        favorite.setPrefWidth(65);
+        favorite.setResizable(false);
         add = new TableColumn();
         add.setCellValueFactory(new PropertyValueFactory("add"));
         add.setPrefWidth(45);
@@ -101,59 +136,15 @@ public class SongListView extends View {
         del.setCellValueFactory(new PropertyValueFactory("del"));
         del.setPrefWidth(45);
         del.setResizable(false);
-        
-        update();
-    }
-
-    public ObservableList<SongInterface> getSongList() {
-        return songList;
-    }
-
-    public void setSongList(ObservableList<SongInterface> songList) {
-        this.songList = songList;
-    }
-
-    public void showSong() {
-        changeTitle.setVisible(false);
-        changeTitle.setDisable(true);
-        saveTitle.setVisible(false);
-        saveTitle.setDisable(true);
-        
-        listLabel.setText("Songs");
-        table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
+        table.getColumns().setAll(favorite, title, artist, album, year, duration, add, edit, del);
         table.setItems(songList);
     }
-    
-    public void showSong(PlaylistInterface playlist) {
-        changeTitle.setVisible(false);
-        changeTitle.setDisable(true);
-        saveTitle.setVisible(false);
-        saveTitle.setDisable(true);
-        
-        listLabel.setText(playlist.getName());
-        listLabel.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 1) {
-                changeTitle.setVisible(true);
-                changeTitle.setDisable(false);
-                saveTitle.setVisible(true);
-                saveTitle.setDisable(false);
-            }
-        });
-        table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
-        table.setItems(playlist.getSongs());
-    }
-    
-    public void showQueue() {
-        listLabel.setText("Queue");
-        table.getColumns().setAll(play, title, artist, album, year, duration, add, edit, del);
-        table.setItems(model.getCurrentPlaylist().getSongs());
-    }
-    
-    @Override
-    public void update() {
-        try {
-            loadSong();
-        } catch (SQLException ex) {
+
+    public void loadSong() throws SQLException {
+        if (model.getUser() == null) {
+            setSongList(model.getSongs());
+        } else {
+            setSongList(model.getUserSongs());
         }
     }
 
@@ -161,15 +152,6 @@ public class SongListView extends View {
         SortedList<SongInterface> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(table.comparatorProperty());
         table.setItems(sortedData);
-    }
-
-    public void loadSong() throws SQLException {
-        if(model.getUser() == null) {
-            songList = model.getSongs();
-        } else {
-            songList = model.getUserSongs();
-        }
-        table.setItems(songList);
     }
 
     public void uploadSong() {
@@ -185,7 +167,7 @@ public class SongListView extends View {
                 for (File f : list) {
                     System.out.println(f.toURI().toString().substring(6, f.toURI().toString().length()).replaceAll("%20", " "));
                     try {
-                        if(model.addSong(f.toURI().toString().substring(6, f.toURI().toString().length()).replaceAll("%20", " "))) {
+                        if (model.addSong(f.toURI().toString().substring(6, f.toURI().toString().length()).replaceAll("%20", " "))) {
                             loadSong();
                         }
                     } catch (SQLException ex) {

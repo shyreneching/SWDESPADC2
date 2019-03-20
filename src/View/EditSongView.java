@@ -9,6 +9,7 @@ import Model.FacadeModel;
 import Mp3agic.InvalidDataException;
 import Mp3agic.NotSupportedException;
 import Mp3agic.UnsupportedTagException;
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -20,7 +21,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -35,9 +38,10 @@ public class EditSongView extends View {
     private FXMLLoader loader;
     private Parent root;
     private FacadeModel model;
+    private File image;
 
     @FXML
-    private Button close, save, edit, cancel, upload;
+    private Button close, save, edit, cancel, upload, remove;
     @FXML
     private TextField number, title, artist, album, genre, year;
     @FXML
@@ -47,7 +51,7 @@ public class EditSongView extends View {
 
     public EditSongView(FacadeModel model) {
         this.model = model;
-
+        
         try {
             loader = new FXMLLoader(getClass().getResource("/View/EditSong.fxml"));
             loader.setController(this);
@@ -90,6 +94,10 @@ public class EditSongView extends View {
             save.setDisable(false);
             cancel.setVisible(true);
             cancel.setDisable(false);
+            remove.setVisible(true);
+            remove.setDisable(false);
+            upload.setVisible(true);
+            upload.setDisable(false);
         });
         save.setOnAction(event -> {
             model.getSelectedSong().setTrackNumber(Integer.parseInt(number.getText()));
@@ -122,8 +130,11 @@ public class EditSongView extends View {
             save.setDisable(true);
             cancel.setVisible(false);
             cancel.setDisable(true);
+            remove.setVisible(false);
+            remove.setDisable(true);
+            upload.setVisible(false);
+            upload.setDisable(true);
 
-            System.out.println(model.getUser() == null);
             if (model.getUser() != null) {
                 try {
                     model.updateSongName(title.getText(), model.getSelectedSong());
@@ -132,6 +143,7 @@ public class EditSongView extends View {
                     model.updateSongAlbum(album.getText(), model.getSelectedSong());
                     model.updateSongGenre(genre.getText(), model.getSelectedSong());
                     model.updateSongYear(Integer.parseInt(year.getText()), model.getSelectedSong());
+                    model.updateSongCover(image, model.getSelectedSong());
                 } catch (UnsupportedTagException ex) {
                     Logger.getLogger(EditSongView.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (NotSupportedException ex) {
@@ -164,9 +176,18 @@ public class EditSongView extends View {
             save.setDisable(true);
             cancel.setVisible(false);
             cancel.setDisable(true);
+            remove.setVisible(false);
+            remove.setDisable(true);
+            upload.setVisible(false);
+            upload.setDisable(true);
         });
         upload.setOnAction(event -> {
-
+            FileChooser file = new FileChooser();
+            image = file.showOpenDialog(stage);
+            cover.setImage(new Image(image.toURI().toString()));
+        });
+        remove.setOnAction(event -> {
+            cover.setImage(new Image(new File("/Files/album_art.png").toURI().toString()));
         });
         close.setOnAction(event -> {
             stage.close();
@@ -180,6 +201,17 @@ public class EditSongView extends View {
         albumLabel.setText(model.getSelectedSong().getAlbum());
         genreLabel.setText(model.getSelectedSong().getGenre());
         yearLabel.setText("" + model.getSelectedSong().getYear());
+        try {
+            cover.setImage(new Image(model.getsongImage(model.getSelectedSong()).toURI().toURL().toString()));
+        } catch (InvalidDataException ex) {
+            Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedTagException ex) {
+            Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NotSupportedException ex) {
+            Logger.getLogger(DashboardView.class.getName()).log(Level.SEVERE, null, ex);
+        }
         number.setVisible(false);
         number.setDisable(true);
         title.setVisible(false);
@@ -196,6 +228,10 @@ public class EditSongView extends View {
         save.setDisable(true);
         cancel.setVisible(false);
         cancel.setDisable(true);
+        remove.setVisible(false);
+        remove.setDisable(true);
+        upload.setVisible(false);
+        upload.setDisable(true);
     }
 
     @Override

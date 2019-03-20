@@ -7,10 +7,10 @@ import java.sql.SQLException;
 public class ArtistPlaylistConcreteFactory extends PlaylistFactory {
 
     public ArtistPlaylistConcreteFactory() {
-        super.playlistList = new UserPlaylist();
+        super.playlistList = new ArtistPlaylist();
     }
 
-    public ObservableList<PlaylistInterface> playlistFactoryMethod(String username) throws SQLException {
-        return PlaylistList.createPlaylist(username);
+    public ObservableList<PlaylistInterface> playlistFactoryMethod(String username, ObservableList<SongInterface> ss) throws SQLException {
+        return playlistList.createPlaylist(username, ss);
     }
 }

@@ -49,7 +49,7 @@ public interface SongInterface {
     
     public String getDuration();
     
-    public Button getPlay();
+    public Button getFavorite();
     
     public Button getEdit();
     
